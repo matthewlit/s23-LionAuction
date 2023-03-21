@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import sqlite3 as sql
+import bcrypt
 
 app = Flask(__name__)
 
@@ -14,8 +15,11 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+        # TODO: Get password from user database
+        user_password = "";
+
         # Perform authentication check
-        if username == 'username' and password == 'password':
+        if bcrypt.checkpw(password.encode('utf-8'), user_password):
             return render_template('main.html', error=None, result=username)
         else:
             return render_template('login.html', error='Invalid Login: Try Again')
@@ -29,5 +33,16 @@ def main():
     return render_template('main.html')
 
 
+# Securely Hashes Password
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+
+# TODO: Populate user database
+def create_user_DB():
+    return
+
+
 if __name__ == "__main__":
+    create_user_DB()
     app.run()
