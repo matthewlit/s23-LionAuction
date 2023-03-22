@@ -22,7 +22,7 @@ def login():
         result = cursor.fetchone()
 
         # Perform authentication check
-        if result != None and bcrypt.checkpw(password.encode('utf-8'), result[0]):
+        if result is not None and bcrypt.checkpw(password.encode('utf-8'), result[0]):
             return render_template('main.html', error=None, result=username)
         else:
             return render_template('login.html', error='Invalid Login: Try Again')
