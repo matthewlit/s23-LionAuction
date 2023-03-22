@@ -13,12 +13,20 @@ input{
     margin: 10px;
 }
 
+h1{
+    text-align: center;
+}
+
+a{
+    border: 10px;
+}
+
 .header{
     background-color: var(--dark);
     color: white;
-    padding: 10px;
+    padding: 20px 10px;
     width: 100%;
-    text-align: center;
+
 }
 
 .form{
@@ -32,11 +40,11 @@ input{
 }
 
 .button{
-    margin: 10px;
     background-color: var(--accent);
     border: none;
     color: white;
     padding: 10px 25px;
     font-size: 16px;
     border-radius: 10px;
+    text-decoration:none;
 }
