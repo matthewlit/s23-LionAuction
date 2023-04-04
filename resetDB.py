@@ -6,16 +6,26 @@ import csv
 # Confirms you want to reset DB
 def confirm():
     user_input = input(
-        "Are you sure you would like to clear the LionAuction database and repopulate? Type YES to confirm\n")
-    if user_input == "YES":
-        print("Dropping Tables...")
-        clear_user_DB()
-        print("Repopulating tables...")
+        "Would you like to:\n"
+        "1: Clear and repopulate the LionAuction database from scratch using dataset - ** Clears all existing data **\n"
+        "2: Add missing data from datasets - ** Will not clear existing data **\n"
+        "Type 1 or 2 select you option, any other input will exit\n")
+    if user_input == "1":
+        user_input = input(
+            "Are you sure you would like to clear the LionAuction database and repopulate from scratch? Type YES to confirm\n")
+        if user_input == "YES":
+            print("\nDropping Tables...")
+            clear_user_DB()
+            print("\nRepopulating tables...")
+            populate_user_DB()
+            print("\n\nFinished")
+        else:
+            print("Action not confirmed, exiting")
+    if user_input == "2":
+        print("\nChecking for missing data in tables...")
         populate_user_DB()
-        print("Finished")
-    else:
-        print("Action not confirmed, exiting")
-        exit()
+        print("\n\nFinished")
+    exit()
 
 
 # Clear user database
@@ -50,17 +60,17 @@ def populate_user_DB():
             cursor = connection.execute('SELECT email FROM users WHERE email=?', (user_email,))
             result = cursor.fetchone()
             if not result:
-                print('', end='\rUsers added: ' + str(num_users) + '/' + str(user_total))
                 hashed_password = hash_password(user_password)
                 connection.execute('INSERT INTO users (email, password) VALUES (?,?)', (user_email, hashed_password))
                 connection.commit()
-                num_users += 1
+            num_users += 1
+            print('', end='\rUsers table: ' + str(num_users) + '/' + str(user_total))
     return
 
 
 # Securely Hashes Password
 def hash_password(password):
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(rounds=4))
 
 
 if __name__ == "__main__":
