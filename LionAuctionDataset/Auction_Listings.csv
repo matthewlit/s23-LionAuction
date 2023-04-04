@@ -1,4 +1,4 @@
-Seller_Email,Listing_ID,Category,Auction_Title,Product_Name,Product_Description,Quantity,Reverse_Price,Max_bids,Status
+Seller_Email,Listing_ID,Category,Auction_Title,Product_Name,Product_Description,Quantity,Reserve_Price,Max_bids,Status
 wspadelli8j@lsu.edu,747,Bakery & Bread,Freshness Guaranteed Steak Rolls,Steak Rolls,Yummy Rolls,5,$50 ,3,1
 wspadelli8j@lsu.edu,2513,Bakery & Bread,Freshness Guaranteed Steak Rolls,Steak Rolls,Yummy Rolls,5,$50 ,3,1
 dnaughton9f@lsu.edu,741,Basketball,Wilson NCAA Street Shot Outdoor Basketball,"Wilson Basketball 9""",For WNBA and kids,5,$145 ,3,1

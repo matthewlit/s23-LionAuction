@@ -1,4 +1,4 @@
-﻿email,routing_number,account_number,balance
+﻿email,bank_routing_number,bank_account_number,balance
 nrideoutmi@lsu.edu,0011-4959-0,31923667,195263
 ndutchburnel@lsu.edu,0011-4959-0,39569244,965663
 wlaurancegt@lsu.edu,0011-4959-0,23574215,147512

@@ -33,13 +33,13 @@ def populate_user_DB():
     connection.execute('CREATE TABLE IF NOT EXISTS users(email TEXT UNIQUE, password TEXT);')
     connection.commit()
 
-    #Get length of csv file
-    with open('Users.csv', 'r') as csv_file:
+    # Get length of csv file
+    with open('LionAuctionDataset/Users.csv', 'r') as csv_file:
         data = csv.reader(csv_file)
-        user_total = sum(1 for row in data)-1
+        user_total = sum(1 for row in data) - 1
 
     # Populate user database
-    with open('Users.csv', 'r') as csv_file:
+    with open('LionAuctionDataset/Users.csv', 'r') as csv_file:
         data = csv.reader(csv_file)
         num_users = 0
         next(data)
