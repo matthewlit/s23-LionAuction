@@ -10,6 +10,8 @@ def confirm():
         "1: Clear and repopulate the LionAuction database from scratch using dataset - ** Clears all existing data **\n"
         "2: Add missing data from datasets - ** Will not clear existing data **\n"
         "Type 1 or 2 select you option, any other input will exit\n")
+
+    # Clear and repopulate
     if user_input == "1":
         user_input = input(
             "Are you sure you would like to clear the LionAuction database and repopulate from scratch? Type YES to confirm\n")
@@ -20,7 +22,9 @@ def confirm():
             populate_DB()
         else:
             print("Action not confirmed, exiting")
-    if user_input == "2":
+
+    # Add missing data
+    elif user_input == "2":
         print("\nChecking for missing data in tables...")
         populate_DB()
     exit()
@@ -106,7 +110,9 @@ def populate_address_DB():
     # Create database
     connection = sql.connect('database.db')
     connection.execute(
-        'CREATE TABLE IF NOT EXISTS address(address_ID TEXT PRIMARY KEY, zipcode INTEGER, street_num INTEGER, street_name TEXT);')
+        'CREATE TABLE IF NOT EXISTS address(address_ID TEXT PRIMARY KEY, zipcode INTEGER, street_num INTEGER, street_name TEXT'
+        ', FOREIGN KEY (address_ID) REFERENCES bidders(home_address_id) '
+        ', FOREIGN KEY (address_ID) REFERENCES local_vendors(Business_Address_ID));')
     connection.commit()
 
     # Get length of csv file
@@ -143,7 +149,8 @@ def populate_auction_listings_DB():
     connection.execute('CREATE TABLE IF NOT EXISTS auction_listings('
                        'Seller_Email TEXT, Listing_ID INTEGER, Category TEXT, Auction_Title TEXT, Product_Name TEXT, '
                        'Product_Description TEXT, Quantity INTEGER, Reserve_Price INTEGER, Max_bids INTEGER, Status INTEGER,'
-                       'PRIMARY KEY (Seller_Email, Listing_ID));')
+                       'PRIMARY KEY (Seller_Email, Listing_ID),'
+                       'FOREIGN KEY (Seller_Email) REFERENCES sellers(email));')
     connection.commit()
 
     # Get length of csv file
@@ -184,7 +191,9 @@ def populate_bidders_DB():
     # Create database
     connection = sql.connect('database.db')
     connection.execute(
-        'CREATE TABLE IF NOT EXISTS bidders(email TEXT PRIMARY KEY , first_name TEXT, last_name TEXT, gender TEXT, age INTEGER, home_address_id TEXT, major TEXT);')
+        'CREATE TABLE IF NOT EXISTS bidders(email TEXT PRIMARY KEY , first_name TEXT, last_name TEXT, gender TEXT, '
+        'age INTEGER, home_address_id TEXT, major TEXT, '
+        'FOREIGN KEY (email) REFERENCES users(email));')
     connection.commit()
 
     # Get length of csv file
@@ -220,7 +229,10 @@ def populate_bids_DB():
     # Create database
     connection = sql.connect('database.db')
     connection.execute(
-        'CREATE TABLE IF NOT EXISTS bids(Bid_ID INTEGER PRIMARY KEY, Seller_Email TEXT, Listing_ID INTEGER, Bidder_email TEXT, Bid_price INTEGER);')
+        'CREATE TABLE IF NOT EXISTS bids(Bid_ID INTEGER PRIMARY KEY, Seller_Email TEXT, Listing_ID INTEGER, Bidder_email TEXT, Bid_price INTEGER,'
+        'FOREIGN KEY (Seller_Email) REFERENCES sellers(email),'
+        'FOREIGN KEY (Bidder_email) REFERENCES bidders(email),'
+        'FOREIGN KEY (Listing_ID) REFERENCES auction_listings(Listing_ID));')
     connection.commit()
 
     # Get length of csv file
@@ -287,7 +299,9 @@ def populate_credit_cards_DB():
     # Create database
     connection = sql.connect('database.db')
     connection.execute(
-        'CREATE TABLE IF NOT EXISTS credit_cards(credit_card_num TEXT PRIMARY KEY, card_type TEXT, expire_month INTEGER, expire_year INTEGER, security_code INTEGER, Owner_email TEXT);')
+        'CREATE TABLE IF NOT EXISTS credit_cards(credit_card_num TEXT PRIMARY KEY, card_type TEXT, expire_month INTEGER, '
+        'expire_year INTEGER, security_code INTEGER, Owner_email TEXT, '
+        'FOREIGN KEY (Owner_email) REFERENCES users(email));')
     connection.commit()
 
     # Get length of csv file
@@ -354,7 +368,9 @@ def populate_helpdesk_DB():
 def populate_local_vendors_DB():
     # Create database
     connection = sql.connect('database.db')
-    connection.execute('CREATE TABLE IF NOT EXISTS local_vendors(Email TEXT PRIMARY KEY, Business_Name TEXT, Business_Address_ID TEXT, Customer_Service_Phone_Number TEXT);')
+    connection.execute('CREATE TABLE IF NOT EXISTS local_vendors(Email TEXT PRIMARY KEY, Business_Name TEXT, '
+                       'Business_Address_ID TEXT, Customer_Service_Phone_Number TEXT,'
+                       'FOREIGN KEY (Email) REFERENCES sellers(email));')
     connection.commit()
 
     # Get length of csv file
@@ -388,7 +404,9 @@ def populate_ratings_DB():
     # Create database
     connection = sql.connect('database.db')
     connection.execute('CREATE TABLE IF NOT EXISTS ratings(Bidder_Email TEXT, Seller_Email TEXT, Date TEXT, Rating INTEGER, Rating_Desc TEXT,'
-                       'PRIMARY KEY (Bidder_Email, Seller_Email, Date));')
+                       'PRIMARY KEY (Bidder_Email, Seller_Email, Date),'
+                       'FOREIGN KEY (Bidder_Email) REFERENCES transactions(Buyer_Email),'
+                       'FOREIGN KEY (Seller_Email) REFERENCES  transactions(Seller_Email));')
     connection.commit()
 
     # Get length of csv file
@@ -459,7 +477,8 @@ def populate_sellers_DB():
     # Create database
     connection = sql.connect('database.db')
     connection.execute(
-        'CREATE TABLE IF NOT EXISTS sellers(email TEXT PRIMARY KEY, bank_routing_number TEXT, bank_account_number INTEGER, balance INTEGER);')
+        'CREATE TABLE IF NOT EXISTS sellers(email TEXT PRIMARY KEY, bank_routing_number TEXT, bank_account_number INTEGER, balance INTEGER,'
+        'FOREIGN KEY (email) REFERENCES users(email));')
     connection.commit()
 
     # Get length of csv file
@@ -494,7 +513,11 @@ def populate_transactions_DB():
     # Create database
     connection = sql.connect('database.db')
     connection.execute(
-        'CREATE TABLE IF NOT EXISTS transactions(Transaction_ID INTEGER PRIMARY KEY, Seller_Email TEXT, Listing_ID INTEGER, Buyer_Email TEXT, Date TEXT, Payment INTEGER);')
+        'CREATE TABLE IF NOT EXISTS transactions(Transaction_ID INTEGER PRIMARY KEY, Seller_Email TEXT, '
+        'Listing_ID INTEGER, Buyer_Email TEXT, Date TEXT, Payment INTEGER,'
+        'FOREIGN KEY (Seller_Email) REFERENCES auction_listings(Seller_Email),'
+        'FOREIGN KEY (Buyer_Email) REFERENCES bidders(email),'
+        'FOREIGN KEY (Listing_ID) REFERENCES auction_listings(Listing_ID));')
     connection.commit()
 
     # Get length of csv file
@@ -529,7 +552,8 @@ def populate_zipcode_info_DB():
     # Create database
     connection = sql.connect('database.db')
     connection.execute(
-        'CREATE TABLE IF NOT EXISTS zipcode_info(zipcode INTEGER PRIMARY KEY, city TEXT, state TEXT);')
+        'CREATE TABLE IF NOT EXISTS zipcode_info(zipcode INTEGER PRIMARY KEY, city TEXT, state TEXT,'
+        'FOREIGN KEY (zipcode) REFERENCES address(zipcode));')
     connection.commit()
 
     # Get length of csv file
