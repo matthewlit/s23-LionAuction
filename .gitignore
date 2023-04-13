@@ -1,4 +1,2 @@
-
-.idea/dataSources.local.xml
-.idea/dataSources/a3dc7f62-8c61-47ca-ae5d-65bf7d0aeb15.xml
-.idea/workspace.xml
+.idea/
+__pycache__/
