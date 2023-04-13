@@ -28,9 +28,8 @@ a{
 .header{
     background-color: var(--dark);
     color: white;
-    padding: 20px 10px;
+    padding: 20px 0px;
     width: 100%;
-
 }
 
 .form{
@@ -51,4 +50,13 @@ a{
     font-size: 16px;
     border-radius: 10px;
     text-decoration:none;
+}
+
+.side_bar{
+    color: white;
+    background-color: var(--alt);
+    padding: 20px 20px;
+    display: table;
+    font-size: 16px;
+    left: 10px;
 }

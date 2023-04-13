@@ -7,21 +7,24 @@
     <title>Bidder Main Page</title>
 </head>
 <body>
-<div align="center">
+<!--Header-->
+<div class="header">
+    <a class="button" style="position: fixed; margin: 25px" href="/" role="button">Sign Out</a>
+    <h1>Lion Auction</h1>
+</div>
 
-    <!--Header-->
-    <div class="header">
-        <h1>Lion Auction</h1>
-    </div>
-
-    <!--Body-->
-        <div class="form">
-            <h2>Welcome to Lion Auction</h2>
-            <h2>Login Successful</h2>
-            <h3>Role: Bidder</h3>
-            <h3>User: {{ result }}</h3>
-            <a class="button" href="/" role="button">Sign Out</a>
-        </div>
+<!--User Info-->
+<div class="side_bar">
+    <ul>
+        <li>Name: {{ data.name }}</li>
+        <li>Email: {{ data.email }}</li>
+        <li>Roll: {{ data.roll }}</li>
+        <li>Age: {{ data.age }}</li>
+        <li>Gender: {{ data.gender }}</li>
+        <li>Major: {{ data.major }}</li>
+        <li>Billing Address: {{ data.address }}</li>
+        <li>Credit Card: {{ data.card }}</li>
+    </ul>
 </div>
 </body>
 </html>
