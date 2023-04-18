@@ -47,6 +47,10 @@ th{
     background: var(--accent);
 }
 
+td{
+    padding: 10px 5px;
+}
+
 tr:nth-child(odd){
     background-color: var(--dark);
 }

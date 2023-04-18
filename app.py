@@ -68,9 +68,6 @@ def bidderMain():
         (username,))
     userInfo = cursor.fetchone()
 
-    # Get listings
-    listings = getAuctionListings('Root')
-
     # Create data list for page
     data = {"name": userInfo[0] + " " + userInfo[1],
             "email": userInfo[2],
@@ -81,8 +78,9 @@ def bidderMain():
             "address": str(userInfo[6]) + " " + userInfo[7] + ", " + userInfo[8] + ", " + userInfo[9] + " " + str(
                 userInfo[10]),
             "card": "**** **** **** " + userInfo[11][-4:],
-            "listings": listings,
-            "category": 'All'}
+            "listings": getAuctionListings('Root'),
+            "category": 'All',
+            "categories": getCategories()}
 
     # On button press
     if request.method == 'POST':
@@ -137,6 +135,20 @@ def getAuctionListings(category):
         if listing: listings.append(listing)
 
     return listings
+
+
+# Gets all categories in database
+def getCategories():
+    categories = []
+
+    # Get categories
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT category_name FROM categories')
+    categoryRows = cursor.fetchall()
+    for row in categoryRows:
+        categories.append(row[0])
+
+    return categories
 
 
 if __name__ == "__main__":
