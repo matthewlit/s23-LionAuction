@@ -7,13 +7,13 @@
     <title>Login Page</title>
 </head>
 <body>
-<div align="center">
+<!--Header-->
+<div class="header">
+    <h1>Lion Auction</h1>
+</div>
 
-    <!--Header-->
-    <div class="header">
-        <h1>Lion Auction</h1>
-    </div>
-
+<!--Contents-->
+<div class="content">
     <!--Login Form-->
     <div class="form">
         <h2>Log In:</h2>
@@ -28,11 +28,10 @@
             <input type="text" id="username" name="username" required class="form-control"><br>
             <label for="password">Password:</label><br>
             <input type="password" id="password" name="password" required class="form-control"><br>
-            <button type="submit" class="button">Submit</button>
+            <button type="submit" class="buttonBig">Submit</button>
             <div style="padding: 25px; font-size: 20px" id="error">{{ error }}</div>
         </form>
     </div>
-
 </div>
 </body>
 </html>

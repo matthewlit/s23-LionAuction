@@ -9,22 +9,61 @@
 <body>
 <!--Header-->
 <div class="header">
-    <a class="button" style="position: fixed; margin: 25px" href="/" role="button">Sign Out</a>
+    <a class="buttonBig" style="position: fixed; margin: 20px" href="/" role="button">Sign Out</a>
     <h1>Lion Auction</h1>
 </div>
 
-<!--User Info-->
-<div class="side_bar">
-    <ul>
-        <li>Name: {{ data.name }}</li>
-        <li>Email: {{ data.email }}</li>
-        <li>Roll: {{ data.roll }}</li>
-        <li>Age: {{ data.age }}</li>
-        <li>Gender: {{ data.gender }}</li>
-        <li>Major: {{ data.major }}</li>
-        <li>Billing Address: {{ data.address }}</li>
-        <li>Credit Card: {{ data.card }}</li>
-    </ul>
+<!--Contents-->
+<div class="content">
+    <!--User Info-->
+    <div class="info">
+        <h2>User Info:</h2>
+        <ul>
+            <li>Name: {{ data.name }}</li>
+            <li>Email: {{ data.email }}</li>
+            <li>Roll: {{ data.roll }}</li>
+            <li>Age: {{ data.age }}</li>
+            <li>Gender: {{ data.gender }}</li>
+            <li>Major: {{ data.major }}</li>
+            <li>Billing Address: {{ data.address }}</li>
+            <li>Credit Card: {{ data.card }}</li>
+        </ul>
+    </div>
+
+    <!--Auction Listings-->
+    <h2 style="text-align: center">Auction Listings: {{ data.category }}</h2>
+    <form style="text-align: center" classaction="" method="post">
+        <label>Select Category:</label>
+        <select name="category" id="category">
+            <option value=""></option>
+            <option value="Root">All</option>
+        </select>
+        <button type="submit" class="buttonSmall">Submit</button>
+    </form>
+    <table class="table table-light">
+        <tr>
+            <th scope="col"> Auction Title</th>
+            <th scope="col"> Product Name</th>
+            <th scope="col"> Product Description</th>
+            <th scope="col"> Category</th>
+            <th scope="col"> Quantity</th>
+            <th scope="col"> Seller Email</th>
+        </tr>
+        <tbody>
+        {% for category in data.listings%}
+            {% for Seller_Email, Listing_ID, Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price, Max_bids, Status in category %}
+                <tr>
+                    <td> {{ Auction_Title }} </td>
+                    <td> {{ Product_Name }} </td>
+                    <td> {{ Product_Description }} </td>
+                    <td> {{ Category }} </td>
+                    <td> {{ Quantity }} </td>
+                    <td> {{ Seller_Email }} </td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

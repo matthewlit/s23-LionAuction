@@ -58,22 +58,41 @@ def bidderMain():
     # Get user info
     username = session.get('username')
     connection = sql.connect('database.db')
-    cursor = connection.execute('SELECT first_name,last_name,email,age,gender,major,street_num,street_name,city,state,address.zipcode,credit_card_num '
-                                'FROM bidders,address,zipcode_info,credit_cards '
-                                'WHERE email=? '
-                                'AND bidders.home_address_id=address.address_ID '
-                                'AND address.zipcode=zipcode_info.zipcode '
-                                'AND bidders.email=credit_cards.Owner_email',
-                                (username,))
-    result = cursor.fetchone()
-    data = {"name": result[0] + " " + result[1],
-            "email": result[2],
+    cursor = connection.execute(
+        'SELECT first_name,last_name,email,age,gender,major,street_num,street_name,city,state,address.zipcode,credit_card_num '
+        'FROM bidders,address,zipcode_info,credit_cards '
+        'WHERE email=? '
+        'AND bidders.home_address_id=address.address_ID '
+        'AND address.zipcode=zipcode_info.zipcode '
+        'AND bidders.email=credit_cards.Owner_email',
+        (username,))
+    userInfo = cursor.fetchone()
+
+    # Get listings
+    listings = getAuctionListings('Root')
+
+    # Create data list for page
+    data = {"name": userInfo[0] + " " + userInfo[1],
+            "email": userInfo[2],
             "roll": "Bidder",
-            "age": result[3],
-            "gender": result[4],
-            "major": result[5].title(),
-            "address": str(result[6]) + " " + result[7] + ", " + result[8] + ", " + result[9] + " " + str(result[10]),
-            "card": "**** **** **** " + result[11][-4:]}
+            "age": userInfo[3],
+            "gender": userInfo[4],
+            "major": userInfo[5].title(),
+            "address": str(userInfo[6]) + " " + userInfo[7] + ", " + userInfo[8] + ", " + userInfo[9] + " " + str(
+                userInfo[10]),
+            "card": "**** **** **** " + userInfo[11][-4:],
+            "listings": listings,
+            "category": 'All'}
+
+    # On button press
+    if request.method == 'POST':
+        # Get category
+        category = request.form['category']
+        listings = getAuctionListings(category)
+        data['listings'] = listings
+        if category == 'Root': category = 'All'
+        data["category"] = category
+        return render_template('bidderMain.html', data=data)
 
     return render_template('bidderMain.html', data=data)
 
@@ -88,6 +107,36 @@ def sellerMain():
 @app.route('/helpdeskMain', methods=['GET', 'POST'])
 def helpdeskMain():
     return render_template('helpdeskMain.html')
+
+
+# Gets auction_listings in given category and subcategories
+def getAuctionListings(category):
+    listings = []
+
+    # Get parent category
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT category_name FROM categories WHERE parent_category=?', (category,))
+    categories = cursor.fetchall()
+
+    # Add listings in parent category
+    cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=?', (category,))
+    listing = cursor.fetchall()
+    if listing: listings.append(listing)
+
+    # Get subcategories
+    for row in categories:
+        cursor = connection.execute('SELECT category_name FROM categories WHERE parent_category=?', (row[0],))
+        subcategory = cursor.fetchall()
+        if subcategory:
+            for cat in subcategory:
+                categories.append(cat)
+
+        # Add listings in category
+        cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=?', (row[0],))
+        listing = cursor.fetchall()
+        if listing: listings.append(listing)
+
+    return listings
 
 
 if __name__ == "__main__":

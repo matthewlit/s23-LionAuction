@@ -3,6 +3,7 @@
     --dark: #0A203A;
     --alt: #1D66ED;
     --accent: #FD8224;
+    --darkalt: #15447B
 }
 
 body {
@@ -21,28 +22,65 @@ h1{
     text-align: center;
 }
 
+h2{
+    color: white;
+}
+
 a{
     border: 10px;
+}
+
+label{
+    color: white;
+    font-size: 16px;
+}
+
+table{
+    text-align: center;
+    color: white;
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+}
+
+th{
+    background: var(--accent);
+}
+
+tr:nth-child(odd){
+    background-color: var(--dark);
+}
+
+tr:nth-child(even){
+    background-color: var(--darkalt)
 }
 
 .header{
     background-color: var(--dark);
     color: white;
-    padding: 20px 0px;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-bottom: 5px solid var(--accent);
+}
+
+.content{
+    background-color: var(--alt);
+    margin: 110px 20px 50px;
 }
 
 .form{
     color: white;
     background-color: var(--alt);
     overflow: hidden;
-    padding: 10px 100px;
-    display: table;
-    margin-top: 100px;
     font-size: 16px;
+    text-align: center;
+    margin-left: 35%;
+    margin-right: 35%;
 }
 
-.button{
+.buttonBig{
     background-color: var(--accent);
     border: none;
     color: white;
@@ -52,11 +90,18 @@ a{
     text-decoration:none;
 }
 
-.side_bar{
+.buttonSmall{
+    background-color: var(--accent);
+    border: none;
     color: white;
-    background-color: var(--alt);
-    padding: 20px 20px;
-    display: table;
+    padding: 5px 20px;
+    font-size: 12px;
+    border-radius: 10px;
+    text-decoration:none;
+}
+
+.info{
+    color: white;
     font-size: 16px;
-    left: 10px;
+    padding: 10px 25px;
 }
