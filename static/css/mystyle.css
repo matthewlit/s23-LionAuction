@@ -72,6 +72,7 @@ tr:nth-child(even){
 .content{
     background-color: var(--alt);
     margin: 110px 20px 50px;
+    padding: 30px 5px;
 }
 
 .form{

@@ -77,20 +77,7 @@ def bidderMain():
             "major": userInfo[5].title(),
             "address": str(userInfo[6]) + " " + userInfo[7] + ", " + userInfo[8] + ", " + userInfo[9] + " " + str(
                 userInfo[10]),
-            "card": "**** **** **** " + userInfo[11][-4:],
-            "listings": getAuctionListings('Root'),
-            "category": 'All',
-            "categories": getCategories()}
-
-    # On button press
-    if request.method == 'POST':
-        # Get category
-        category = request.form['category']
-        listings = getAuctionListings(category)
-        data['listings'] = listings
-        if category == 'Root': category = 'All'
-        data["category"] = category
-        return render_template('bidderMain.html', data=data)
+            "card": "**** **** **** " + userInfo[11][-4:],}
 
     return render_template('bidderMain.html', data=data)
 
@@ -105,6 +92,28 @@ def sellerMain():
 @app.route('/helpdeskMain', methods=['GET', 'POST'])
 def helpdeskMain():
     return render_template('helpdeskMain.html')
+
+
+# Auction Listing Page
+@app.route('/auctionListings', methods=['GET', 'POST'])
+def auctionListings():
+
+    # Create data list for page
+    data = {"listings": getAuctionListings('Root'),
+            "category": 'All',
+            "categories": getCategories()}
+
+    # On button press
+    if request.method == 'POST':
+        # Get category
+        category = request.form['category']
+        listings = getAuctionListings(category)
+        data['listings'] = listings
+        if category == 'Root': category = 'All'
+        data["category"] = category
+        return render_template('auctionListings.html', data=data)
+
+    return render_template('auctionListings.html', data=data)
 
 
 # Gets auction_listings in given category and subcategories
@@ -137,7 +146,7 @@ def getAuctionListings(category):
     return listings
 
 
-# Gets all categories in database
+# Gets all categories in database with listings
 def getCategories():
     categories = []
 
@@ -146,7 +155,10 @@ def getCategories():
     cursor = connection.execute('SELECT category_name FROM categories')
     categoryRows = cursor.fetchall()
     for row in categoryRows:
-        categories.append(row[0])
+        # Check if category has listings
+        cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=?', (row[0],))
+        if cursor.fetchone():
+            categories.append(row[0])
 
     return categories
 
