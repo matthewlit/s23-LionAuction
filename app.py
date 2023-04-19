@@ -13,7 +13,7 @@ host = 'http://127.0.0.1:5000/'
 
 # Login Page
 @app.route('/', methods=['GET', 'POST'])
-def login():
+def loginPage():
     # On login button press
     if request.method == 'POST':
         roll = request.form['roll']
@@ -54,7 +54,7 @@ def login():
 
 # Bidder Main Page
 @app.route('/bidderMain', methods=['GET', 'POST'])
-def bidderMain():
+def bidderMainPage():
     # Get user info
     username = session.get('username')
     connection = sql.connect('database.db')
@@ -77,27 +77,26 @@ def bidderMain():
             "major": userInfo[5].title(),
             "address": str(userInfo[6]) + " " + userInfo[7] + ", " + userInfo[8] + ", " + userInfo[9] + " " + str(
                 userInfo[10]),
-            "card": "**** **** **** " + userInfo[11][-4:],}
+            "card": "**** **** **** " + userInfo[11][-4:], }
 
     return render_template('bidderMain.html', data=data)
 
 
 # Seller Main Page
 @app.route('/sellerMain', methods=['GET', 'POST'])
-def sellerMain():
+def sellerMainPage():
     return render_template('sellerMain.html')
 
 
 # Help Desk Main Page
 @app.route('/helpdeskMain', methods=['GET', 'POST'])
-def helpdeskMain():
+def helpdeskMainPage():
     return render_template('helpdeskMain.html')
 
 
 # Auction Listing Page
 @app.route('/auctionListings', methods=['GET', 'POST'])
-def auctionListings():
-
+def auctionListingsPage():
     # Create data list for page
     data = {"listings": getAuctionListings('Root'),
             "category": 'All',
@@ -116,6 +115,20 @@ def auctionListings():
     return render_template('auctionListings.html', data=data)
 
 
+# Bid Status Page
+@app.route('/bidStatus', methods=['GET', 'POST'])
+def bidStatusPage():
+    username = session.get('username')
+
+    return render_template('bidStatus.html', data=getBids(username))
+
+
+# Bidding Page
+@app.route('/bid', methods=['GET', 'POST'])
+def bidPage():
+    return render_template('bid.html', data=None)
+
+
 # Gets auction_listings in given category and subcategories
 def getAuctionListings(category):
     listings = []
@@ -128,7 +141,13 @@ def getAuctionListings(category):
     # Add listings in parent category
     cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=?', (category,))
     listing = cursor.fetchall()
-    if listing: listings.append(listing)
+    if listing:
+        for auction in listing:
+            highBid = getHighestBid(auction[1])
+            if highBid:
+                listings.append(auction + highBid)
+            else:
+                listings.append(auction + ('No Bids',))
 
     # Get subcategories
     for row in categories:
@@ -141,9 +160,39 @@ def getAuctionListings(category):
         # Add listings in category
         cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=?', (row[0],))
         listing = cursor.fetchall()
-        if listing: listings.append(listing)
+        if listing:
+            for auction in listing:
+                highBid = getHighestBid(auction[1])
+                if highBid:
+                    listings.append(auction + highBid)
+                else:
+                    listings.append(auction + ('No Bids',))
 
     return listings
+
+
+# Gets auctions the user had bids on
+def getBids(user):
+    bids = []
+
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT auction_listings.*,max(Bid_price) FROM auction_listings,bids '
+                                'WHERE auction_listings.Listing_ID = bids.Listing_ID '
+                                'AND bids.Bidder_email=? GROUP BY bids.Listing_ID', (user, ))
+    bid = cursor.fetchall()
+    if bid:
+        for b in bid:
+            highBid = getHighestBid(b[1])
+            bids.append(b + highBid)
+    return bids
+
+
+# Gets highest bid on an auction
+def getHighestBid(Listing_ID):
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT max(Bid_price) FROM bids WHERE Listing_ID=? GROUP BY Listing_ID',
+                                (Listing_ID,))
+    return cursor.fetchone()
 
 
 # Gets all categories in database with listings

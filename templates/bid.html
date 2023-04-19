@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../static/css/mystyle.css">
+    <title>{{ data.product_name }}</title>
+</head>
+<body>
+<!--Header-->
+<div class="header">
+    <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 90%" href="/" role="button">Sign Out</a>
+    <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" href="/auctionListings" role="button">Back</a>
+    <h1>Lion Auction</h1>
+</div>
+
+<!--Contents-->
+<div class="content">
+    <div style="text-align: center">
+        <!--Listing Info-->
+        <h2 style="text-align: center">Bid:</h2>
+        <table style="display: inline-block; vertical-align: middle">
+            <tr>
+                <th scope="row"> Auction Title</th>
+                <td> {{ Auction_Title }} </td>
+            </tr>
+            <tr>
+                <th scope="row"> Product Name</th>
+                <td> {{ Product_Name }} </td>
+            </tr>
+            <tr>
+                <th scope="row"> Product Description</th>
+                <td> {{ Product_Description }} </td>
+            </tr>
+            <tr>
+                <th scope="row"> Category</th>
+                <td> {{ Category }} </td>
+            </tr>
+            <tr>
+                <th scope="row"> Quantity</th>
+                <td> {{ Quantity }} </td>
+            </tr>
+            <tr>
+                <th scope="row"> Status</th>
+                <td> {{ Status }}</td>
+            </tr>
+            <tr>
+                <th scope="row"> Seller Email</th>
+                <td> {{ Seller_Email }} </td>
+            </tr>
+             <tr>
+                <th scope="row"> Highest Bid</th>
+                <td> {{ Highest_Bid }} </td>
+            </tr>
+             <tr>
+                <th scope="row"> Your Bid</th>
+                <td> {{ User_Bid }} </td>
+            </tr>
+        </table>
+
+        <!--Bid Button-->
+        <div class="form" style="display: inline-block; vertical-align: middle;">
+            <form action="" method="post">
+                <label for="bidAmount">Bid Amount:</label><br>
+                <input type="text" id="username" name="username" required class="form-control"><br>
+                <button type="submit" class="buttonBig">Submit Bid</button><br>
+                <div style="padding: 25px; font-size: 20px" id="error">{{ error }}</div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

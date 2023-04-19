@@ -16,19 +16,19 @@
 <div class="content">
     <!--Login Form-->
     <div class="form">
-        <h2>Log In:</h2>
         <form action="" method="post">
-            <label>Login as:</label><br>
+            <h2>Log In:</h2>
+            <label>Login as:</label>
             <select name="roll" id="roll">
                 <option value="bidder">Bidder</option>
                 <option value="seller">Seller</option>
                 <option value="helpdesk">Help Desk</option>
             </select><br>
-            <label for="username">Username:</label><br>
+            <label for="username">Username:</label>
             <input type="text" id="username" name="username" required class="form-control"><br>
-            <label for="password">Password:</label><br>
+            <label for="password">Password:</label>
             <input type="password" id="password" name="password" required class="form-control"><br>
-            <button type="submit" class="buttonBig">Submit</button>
+            <button type="submit" class="buttonBig">Submit</button><br>
             <div style="padding: 25px; font-size: 20px" id="error">{{ error }}</div>
         </form>
     </div>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../static/css/mystyle.css">
-    <title>Auction Listings</title>
+    <title>Bid Status</title>
 </head>
 <body>
 <!--Header-->
@@ -16,34 +16,20 @@
 
 <!--Contents-->
 <div class="content">
-    <!--Auction Listings-->
-    <h2 style="text-align: center">Auction Listings: {{ data.category }}</h2>
-    <form style="text-align: center" classaction="" method="post">
-        <label>Select Category:</label>
-        <select name="category" id="category">
-            <option value=""></option>
-            <option value="Root">All</option>
-            {%  for category in data.categories %}
-                <option value="{{ category }}">{{ category }}</option>
-            {%  endfor %}
-        </select>
-        <button type="submit" class="buttonSmall">Submit</button>
-    </form>
+    <!--Bid Status-->
+    <h2 style="text-align: center">Bid Status:</h2>
     <table style="width: 90%;">
         <tr>
             <th scope="col"> Auction Title</th>
-            <th scope="col"> Product Name</th>
-            <th scope="col"> Quantity</th>
             <th scope="col"> Status</th>
-            <th scope="col"> Highest_Bid</th>
+            <th scope="col"> Your Bid</th>
+            <th scope="col"> Highest Bid</th>
             <th scope="col"> </th>
         </tr>
         <tbody>
-        {% for auction in data.listings%}
+        {% for auction in data%}
             <tr>
                 <td> {{ auction[3] }} </td>
-                <td> {{ auction[4] }} </td>
-                <td> {{ auction[6] }} </td>
                 {% if auction[9]==0 %}
                 <td> Inactive </td>
                 {% elif auction[9]==1 %}
@@ -51,11 +37,8 @@
                 {% elif auction[9]==2 %}
                 <td> Sold </td>
                 {% endif %}
-                {% if auction[10]=='No Bids' %}
-                <td> {{ auction[10] }} </td>
-                {% else %}
-                <td> ${{ auction[10] }} </td>
-                {% endif %}
+                <td> ${{ auction[10] }}</td>
+                <td> ${{ auction[11] }}</td>
                 <td><a class="buttonSmall" href="" role="button">More Info / Bid</a></td>
             </tr>
         {% endfor %}
