@@ -104,13 +104,19 @@ def auctionListingsPage():
 
     # On button press
     if request.method == 'POST':
-        # Get category
-        category = request.form['category']
-        listings = getAuctionListings(category)
-        data['listings'] = listings
-        if category == 'Root': category = 'All'
-        data["category"] = category
-        return render_template('auctionListings.html', data=data)
+        if request.form['button'] == 'Submit':
+            # Get category
+            category = request.form['category']
+            listings = getAuctionListings(category)
+            data['listings'] = listings
+            if category == 'Root': category = 'All'
+            data["category"] = category
+            return render_template('auctionListings.html', data=data)
+
+        else:
+            # Redirect to page to bid and get more info
+            session['listing_ID'] = request.form['button']
+            return redirect("/bid")
 
     return render_template('auctionListings.html', data=data)
 
@@ -120,13 +126,21 @@ def auctionListingsPage():
 def bidStatusPage():
     username = session.get('username')
 
+    if request.method == 'POST':
+        # Redirect to page to bid and get more info
+        session['listing_ID'] = request.form['bid_button']
+        return redirect("/bid")
+
     return render_template('bidStatus.html', data=getBids(username))
 
 
 # Bidding Page
 @app.route('/bid', methods=['GET', 'POST'])
 def bidPage():
-    return render_template('bid.html', data=None)
+
+    listing_ID = session.get('listing_ID')
+
+    return render_template('bid.html', data=getAuctionInfo(listing_ID))
 
 
 # Gets auction_listings in given category and subcategories

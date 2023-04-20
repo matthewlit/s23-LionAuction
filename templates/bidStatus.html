@@ -10,7 +10,7 @@
 <!--Header-->
 <div class="header">
     <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 90%" href="/" role="button">Sign Out</a>
-    <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" href="/bidderMain" role="button">Back</a>
+    <button class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" role="button" onclick="history.back()">Back</button>
     <h1>Lion Auction</h1>
 </div>
 
@@ -39,7 +39,7 @@
                 {% endif %}
                 <td> ${{ auction[10] }}</td>
                 <td> ${{ auction[11] }}</td>
-                <td><button type="button" class="buttonSmall">More Info / Bid</button></td>
+                <td><form method="post"><input type="submit" class="buttonSmall" name="bid_button" value=" {{ auction[1] }}"></form></td>
             </tr>
         {% endfor %}
         </tbody>

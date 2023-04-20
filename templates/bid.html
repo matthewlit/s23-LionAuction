@@ -10,7 +10,7 @@
 <!--Header-->
 <div class="header">
     <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 90%" href="/" role="button">Sign Out</a>
-    <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" href="/auctionListings" role="button">Back</a>
+    <button class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" role="button" onclick="history.back()">Back</button>
     <h1>Lion Auction</h1>
 </div>
 
@@ -22,39 +22,45 @@
         <table style="display: inline-block; vertical-align: middle">
             <tr>
                 <th scope="row"> Auction Title</th>
-                <td> {{ Auction_Title }} </td>
+                <td> {{ data[3] }} </td>
             </tr>
             <tr>
                 <th scope="row"> Product Name</th>
-                <td> {{ Product_Name }} </td>
+                <td> {{ data[4] }} </td>
             </tr>
             <tr>
                 <th scope="row"> Product Description</th>
-                <td> {{ Product_Description }} </td>
+                <td> {{ data[5] }} </td>
             </tr>
             <tr>
                 <th scope="row"> Category</th>
-                <td> {{ Category }} </td>
+                <td> {{ data[2] }} </td>
             </tr>
             <tr>
                 <th scope="row"> Quantity</th>
-                <td> {{ Quantity }} </td>
+                <td> {{ data[6] }} </td>
             </tr>
             <tr>
                 <th scope="row"> Status</th>
-                <td> {{ Status }}</td>
+                {% if data[9]==0 %}
+                <td> Inactive </td>
+                {% elif data[9]==1 %}
+                <td> Active </td>
+                {% elif data[9]==2 %}
+                <td> Sold </td>
+                {% endif %}
             </tr>
             <tr>
                 <th scope="row"> Seller Email</th>
-                <td> {{ Seller_Email }} </td>
+                <td> {{ data[0] }} </td>
             </tr>
              <tr>
                 <th scope="row"> Highest Bid</th>
-                <td> {{ Highest_Bid }} </td>
+                <td> {{ data[11] }} </td>
             </tr>
              <tr>
                 <th scope="row"> Your Bid</th>
-                <td> {{ User_Bid }} </td>
+                <td> {{ data[10] }} </td>
             </tr>
         </table>
 
