@@ -139,15 +139,11 @@ def getAuctionListings(category):
     categories = cursor.fetchall()
 
     # Add listings in parent category
-    cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=?', (category,))
+    cursor = connection.execute('SELECT Listing_ID FROM auction_listings WHERE Category=?', (category,))
     listing = cursor.fetchall()
     if listing:
         for auction in listing:
-            highBid = getHighestBid(auction[1])
-            if highBid:
-                listings.append(auction + highBid)
-            else:
-                listings.append(auction + ('No Bids',))
+            listings.append(getAuctionInfo(auction[0]))
 
     # Get subcategories
     for row in categories:
@@ -158,41 +154,54 @@ def getAuctionListings(category):
                 categories.append(cat)
 
         # Add listings in category
-        cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=?', (row[0],))
+        cursor = connection.execute('SELECT Listing_ID FROM auction_listings WHERE Category=?', (row[0],))
         listing = cursor.fetchall()
         if listing:
             for auction in listing:
-                highBid = getHighestBid(auction[1])
-                if highBid:
-                    listings.append(auction + highBid)
-                else:
-                    listings.append(auction + ('No Bids',))
+                listings.append(getAuctionInfo(auction[0]))
 
     return listings
 
 
 # Gets auctions the user had bids on
 def getBids(user):
-    bids = []
+    bidsList = []
 
     connection = sql.connect('database.db')
-    cursor = connection.execute('SELECT auction_listings.*,max(Bid_price) FROM auction_listings,bids '
+    cursor = connection.execute('SELECT auction_listings.Listing_ID,max(Bid_price) FROM auction_listings,bids '
                                 'WHERE auction_listings.Listing_ID = bids.Listing_ID '
-                                'AND bids.Bidder_email=? GROUP BY bids.Listing_ID', (user, ))
-    bid = cursor.fetchall()
-    if bid:
-        for b in bid:
-            highBid = getHighestBid(b[1])
-            bids.append(b + highBid)
-    return bids
+                                'AND bids.Bidder_email=? GROUP BY bids.Listing_ID', (user,))
+    bids = cursor.fetchall()
+    if bids:
+        for bid in bids:
+            bidsList.append(getAuctionInfo(bid[0]))
+    return bidsList
 
 
-# Gets highest bid on an auction
-def getHighestBid(Listing_ID):
+# Gets all information of a given auction
+def getAuctionInfo(Listing_ID):
+    auctionInfo = ()
+
     connection = sql.connect('database.db')
-    cursor = connection.execute('SELECT max(Bid_price) FROM bids WHERE Listing_ID=? GROUP BY Listing_ID',
-                                (Listing_ID,))
-    return cursor.fetchone()
+    # Gets auction details
+    cursor = connection.execute('SELECT auction_listings.* FROM auction_listings '
+                                'WHERE Listing_ID=?', (Listing_ID,))
+    info1 = cursor.fetchone()
+    # Gets users highest bid
+    cursor = connection.execute('SELECT max(Bid_price) FROM bids '
+                                'WHERE Listing_ID = ? AND Bidder_email=? GROUP BY Listing_ID',
+                                (Listing_ID, session.get('username'),))
+    info2 = cursor.fetchone()
+    if info2 is None: info2 = ('No Bids',)
+    # Gets highest bid in auction
+    cursor = connection.execute('SELECT max(Bid_price) FROM bids '
+                                'WHERE Listing_ID = ? GROUP BY Listing_ID', (Listing_ID,))
+    info3 = cursor.fetchone()
+    if info3 is None: info3 = ('No Bids',)
+
+    auctionInfo = info1 + info2 + info3
+
+    return auctionInfo
 
 
 # Gets all categories in database with listings
