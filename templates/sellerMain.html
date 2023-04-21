@@ -7,21 +7,35 @@
     <title>Seller Main Page</title>
 </head>
 <body>
-<div align="center">
+<!--Header-->
+<div class="header">
+    <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 90%" href="/" role="button">Sign Out</a>
+    <h1>Lion Auction</h1>
+</div>
 
-    <!--Header-->
-    <div class="header">
-        <h1>Lion Auction</h1>
-    </div>
-
-    <!--Body-->
-        <div class="form">
-            <h2>Welcome to Lion Auction</h2>
-            <h2>Login Successful</h2>
-            <h3>Role: Seller</h3>
-            <h3>User: {{ result }}</h3>
-            <a class="button" href="/" role="button">Sign Out</a>
+<!--Contents-->
+<div class="content">
+    <div style="text-align: center">
+        <!--User Info-->
+        <div class="info" style="vertical-align: middle">
+            <h2>User Info:</h2>
+            <p>Email: {{ data.email }}</p>
+            <p>Roll: {{ data.roll }}</p>
+            <p>Bank Routing Number: {{ data.bank_routing_number }}</p>
+            <p>Bank Account Number: {{ data.bank_account_number }}</p>
+            {% if data.business_name %}
+                <h2>Business Info:</h2>
+                <p>Business Name: {{ data.business_name }}</p>
+                <p>Business Address: {{ data.business_address }}</p>
+                <p>Customer Service Phone Number: {{ data.customer_service }}</p>
+            {% endif %}
         </div>
+
+        <!--Navigation-->
+        <div class="info" style="vertical-align: middle">
+            <a class="buttonBig" href="/" role="button">temp</a>
+        </div>
+    </div>
 </div>
 </body>
 </html>

@@ -56,7 +56,7 @@
                 {% else %}
                 <td> ${{ auction[11] }} </td>
                 {% endif %}
-                <td><form method="post"><input type="submit" class="buttonSmall" name="button" value=" {{ auction[1] }}"></form></td>
+                <td><form method="post"><button type="submit" class="buttonSmall" name="bid_button" value=" {{ auction[1] }}">More Info / Bid</button></form></td>
             </tr>
         {% endfor %}
         </tbody>

@@ -59,7 +59,7 @@ def bidderMainPage():
     username = session.get('username')
     connection = sql.connect('database.db')
     cursor = connection.execute(
-        'SELECT first_name,last_name,email,age,gender,major,street_num,street_name,city,state,address.zipcode,credit_card_num '
+        'SELECT first_name,last_name,age,gender,major,street_num,street_name,city,state,address.zipcode,credit_card_num '
         'FROM bidders,address,zipcode_info,credit_cards '
         'WHERE email=? '
         'AND bidders.home_address_id=address.address_ID '
@@ -70,14 +70,15 @@ def bidderMainPage():
 
     # Create data list for page
     data = {"name": userInfo[0] + " " + userInfo[1],
-            "email": userInfo[2],
+            "email": username,
             "roll": "Bidder",
-            "age": userInfo[3],
-            "gender": userInfo[4],
-            "major": userInfo[5].title(),
-            "address": str(userInfo[6]) + " " + userInfo[7] + ", " + userInfo[8] + ", " + userInfo[9] + " " + str(
-                userInfo[10]),
-            "card": "**** **** **** " + userInfo[11][-4:], }
+            "age": userInfo[2],
+            "gender": userInfo[3],
+            "major": userInfo[4].title(),
+            "address": str(userInfo[5]) + " " + userInfo[6] + ", " + userInfo[7] + ", " + userInfo[8] + " " + str(
+                userInfo[9]),
+            "card": "**** **** **** " + userInfo[10][-4:]
+            }
 
     return render_template('bidderMain.html', data=data)
 
@@ -85,13 +86,56 @@ def bidderMainPage():
 # Seller Main Page
 @app.route('/sellerMain', methods=['GET', 'POST'])
 def sellerMainPage():
-    return render_template('sellerMain.html')
+    # Get user info
+    username = session.get('username')
+    connection = sql.connect('database.db')
+    cursor = connection.execute(
+        'SELECT bank_routing_number, bank_account_number FROM sellers WHERE email=?', (username,))
+    userInfo = cursor.fetchone()
+
+    # Create data list for page
+    data = {"email": username,
+            "roll": "Seller",
+            "bank_routing_number": userInfo[0],
+            "bank_account_number": userInfo[1],
+            "business_name": None,
+            "business_address": None,
+            "customer_service": None
+            }
+
+    # If local vendor add info
+    cursor = connection.execute(
+        'SELECT Business_Name,street_num,street_name,city,state,address.zipcode,Customer_Service_Phone_Number '
+        'FROM local_vendors,address,zipcode_info '
+        'WHERE email=? '
+        'AND local_vendors.Business_Address_ID=address.address_ID '
+        'AND address.zipcode=zipcode_info.zipcode', (username,))
+    vendor = cursor.fetchone()
+    if vendor:
+        data['business_name'] = vendor[0]
+        data['business_address'] = str(vendor[1]) + " " + vendor[2] + ", " + vendor[3] + ", " + vendor[4] + " " + str(vendor[5])
+        data['customer_service'] = vendor[6]
+
+    return render_template('sellerMain.html', data=data)
 
 
 # Help Desk Main Page
 @app.route('/helpdeskMain', methods=['GET', 'POST'])
 def helpdeskMainPage():
-    return render_template('helpdeskMain.html')
+    # Get user info
+    username = session.get('username')
+    connection = sql.connect('database.db')
+    cursor = connection.execute(
+        'SELECT position FROM helpdesk WHERE email=?', (username,))
+    userInfo = cursor.fetchone()
+
+    # Create data list for page
+    data = {"email": username,
+            "roll": "Help Desk",
+            "position": userInfo[0]
+            }
+
+    return render_template('helpdeskMain.html', data=data)
 
 
 # Auction Listing Page
@@ -100,7 +144,8 @@ def auctionListingsPage():
     # Create data list for page
     data = {"listings": getAuctionListings('Root'),
             "category": 'All',
-            "categories": getCategories()}
+            "categories": getCategories()
+            }
 
     # On button press
     if request.method == 'POST':
@@ -110,7 +155,7 @@ def auctionListingsPage():
             listings = getAuctionListings(category)
             data['listings'] = listings
             if category == 'Root': category = 'All'
-            data["category"] = category
+            data['category'] = category
             return render_template('auctionListings.html', data=data)
 
         else:
@@ -137,7 +182,6 @@ def bidStatusPage():
 # Bidding Page
 @app.route('/bid', methods=['GET', 'POST'])
 def bidPage():
-
     listing_ID = session.get('listing_ID')
 
     return render_template('bid.html', data=getAuctionInfo(listing_ID))
