@@ -167,7 +167,7 @@ def populate_auction_listings_DB():
         # Add each entry to database
         for line in data:
             Seller_Email, Listing_ID, Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price, Max_bids, Status = \
-                line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9]
+                line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7][1:], line[8], line[9]
             # Check if entry is in database
             cursor = connection.execute(
                 'SELECT Seller_Email, Listing_ID FROM auction_listings WHERE Seller_Email=? AND Listing_ID=?',
@@ -179,7 +179,7 @@ def populate_auction_listings_DB():
                                    'VALUES (?,?,?,?,?,?,?,?,?,?,?)',
                                    (Seller_Email, Listing_ID, Category, Auction_Title, Product_Name,
                                     Product_Description,
-                                    Quantity, Reserve_Price, Max_bids, Status,""))
+                                    Quantity, Reserve_Price, Max_bids, Status, ""))
                 connection.commit()
             parsed_entries += 1
             print('', end='\rAuction Listings table: ' + str(parsed_entries) + '/' + str(total_entries))
@@ -210,7 +210,7 @@ def populate_bidders_DB():
         # Add each entry to database
         for line in data:
             email, first_name, last_name, gender, age, home_address_id, major = line[0], line[1], line[2], line[3], \
-            line[4], line[5], line[6]
+                line[4], line[5], line[6]
             # Check if entry is in database
             cursor = connection.execute('SELECT email FROM bidders WHERE email=?', (email,))
             result = cursor.fetchone()
@@ -287,7 +287,8 @@ def populate_categories_DB():
             cursor = connection.execute('SELECT category_name FROM categories WHERE category_name=?', (category_name,))
             result = cursor.fetchone()
             if not result:
-                connection.execute('INSERT INTO categories (parent_category, category_name) VALUES (?,?)', (parent_category, category_name))
+                connection.execute('INSERT INTO categories (parent_category, category_name) VALUES (?,?)',
+                                   (parent_category, category_name))
                 connection.commit()
             parsed_entries += 1
             print('', end='\rCategories table: ' + str(parsed_entries) + '/' + str(total_entries))
@@ -320,7 +321,8 @@ def populate_credit_cards_DB():
             credit_card_num, card_type, expire_month, expire_year, security_code, Owner_email = line[0], line[1], line[
                 2], line[3], line[4], line[5]
             # Check if entry is in database
-            cursor = connection.execute('SELECT credit_card_num FROM credit_cards WHERE credit_card_num=?', (credit_card_num,))
+            cursor = connection.execute('SELECT credit_card_num FROM credit_cards WHERE credit_card_num=?',
+                                        (credit_card_num,))
             result = cursor.fetchone()
             if not result:
                 connection.execute(
@@ -386,13 +388,15 @@ def populate_local_vendors_DB():
         next(data)
         # Add each entry to database
         for line in data:
-            Email, Business_Name, Business_Address_ID, Customer_Service_Phone_Number = line[0], line[1], line[2], line[3]
+            Email, Business_Name, Business_Address_ID, Customer_Service_Phone_Number = line[0], line[1], line[2], line[
+                3]
             # Check if entry is in database
             cursor = connection.execute('SELECT Email FROM local_vendors WHERE Email=?', (Email,))
             result = cursor.fetchone()
             if not result:
-                connection.execute('INSERT INTO local_vendors (Email, Business_Name, Business_Address_ID, Customer_Service_Phone_Number) VALUES (?,?,?,?)',
-                                   (Email, Business_Name, Business_Address_ID, Customer_Service_Phone_Number))
+                connection.execute(
+                    'INSERT INTO local_vendors (Email, Business_Name, Business_Address_ID, Customer_Service_Phone_Number) VALUES (?,?,?,?)',
+                    (Email, Business_Name, Business_Address_ID, Customer_Service_Phone_Number))
                 connection.commit()
             parsed_entries += 1
             print('', end='\rLocal vendors table: ' + str(parsed_entries) + '/' + str(total_entries))
@@ -404,10 +408,11 @@ def populate_local_vendors_DB():
 def populate_ratings_DB():
     # Create database
     connection = sql.connect('database.db')
-    connection.execute('CREATE TABLE IF NOT EXISTS ratings(Bidder_Email TEXT, Seller_Email TEXT, Date TEXT, Rating INTEGER, Rating_Desc TEXT,'
-                       'PRIMARY KEY (Bidder_Email, Seller_Email, Date),'
-                       'FOREIGN KEY (Bidder_Email) REFERENCES transactions(Buyer_Email),'
-                       'FOREIGN KEY (Seller_Email) REFERENCES  transactions(Seller_Email));')
+    connection.execute(
+        'CREATE TABLE IF NOT EXISTS ratings(Bidder_Email TEXT, Seller_Email TEXT, Date TEXT, Rating INTEGER, Rating_Desc TEXT,'
+        'PRIMARY KEY (Bidder_Email, Seller_Email, Date),'
+        'FOREIGN KEY (Bidder_Email) REFERENCES transactions(Buyer_Email),'
+        'FOREIGN KEY (Seller_Email) REFERENCES  transactions(Seller_Email));')
     connection.commit()
 
     # Get length of csv file
@@ -442,8 +447,9 @@ def populate_ratings_DB():
 def populate_requests_DB():
     # Create database
     connection = sql.connect('database.db')
-    connection.execute('CREATE TABLE IF NOT EXISTS requests(request_id INTEGER PRIMARY KEY, sender_email TEXT, helpdesk_staff_email TEXT, '
-                       'request_type TEXT, request_desc TEXT, request_status INTEGER);')
+    connection.execute(
+        'CREATE TABLE IF NOT EXISTS requests(request_id INTEGER PRIMARY KEY, sender_email TEXT, helpdesk_staff_email TEXT, '
+        'request_type TEXT, request_desc TEXT, request_status INTEGER);')
     connection.commit()
 
     # Get length of csv file
@@ -458,7 +464,8 @@ def populate_requests_DB():
         next(data)
         # Add each entry to database
         for line in data:
-            request_id, sender_email, helpdesk_staff_email, request_type, request_desc, request_status = line[0], line[1], line[2], line[3], line[4], line[5]
+            request_id, sender_email, helpdesk_staff_email, request_type, request_desc, request_status = line[0], line[
+                1], line[2], line[3], line[4], line[5]
             # Check if entry is in database
             cursor = connection.execute('SELECT request_id FROM requests WHERE request_id=?', (request_id,))
             result = cursor.fetchone()
@@ -533,9 +540,11 @@ def populate_transactions_DB():
         next(data)
         # Add each entry to database
         for line in data:
-            Transaction_ID, Seller_Email, Listing_ID, Buyer_Email, Date, Payment = line[0], line[1], line[2], line[3], line[4], line[5]
+            Transaction_ID, Seller_Email, Listing_ID, Buyer_Email, Date, Payment = line[0], line[1], line[2], line[3], \
+            line[4], line[5]
             # Check if entry is in database
-            cursor = connection.execute('SELECT Transaction_ID FROM transactions WHERE Transaction_ID=?', (Transaction_ID,))
+            cursor = connection.execute('SELECT Transaction_ID FROM transactions WHERE Transaction_ID=?',
+                                        (Transaction_ID,))
             result = cursor.fetchone()
             if not result:
                 connection.execute(

@@ -8,14 +8,18 @@
 
 body {
     background-color: var(--main);
+    font-family: Helvetica;
+    color: black;
 }
 
 input{
     margin: 10px;
+    color: black;
 }
 
 select{
     margin: 10px;
+    color: black;
 }
 
 h1{
@@ -54,6 +58,8 @@ td{
     padding: 10px 5px;
     border-top: darkgray solid;
     border-bottom: darkgray solid;
+    overflow: hidden;
+    width: auto;
 }
 
 tr:nth-child(odd){

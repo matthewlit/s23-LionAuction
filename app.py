@@ -1,3 +1,8 @@
+"""
+Author: Matthew Kelleher
+Last Modified: April 24, 2023
+"""
+
 from flask import Flask, render_template, request, session, redirect
 from flask_session import Session
 import sqlite3 as sql
@@ -11,6 +16,8 @@ Session(app)
 host = 'http://127.0.0.1:5000/'
 
 
+# <----------------------------------------- Page Functions ----------------------------------------->
+
 # Login Page
 @app.route('/', methods=['GET', 'POST'])
 def loginPage():
@@ -22,6 +29,7 @@ def loginPage():
 
         # Gets hashed password from user database
         connection = sql.connect('database.db')
+        cursor = None
         if roll == 'bidder':
             cursor = connection.execute(
                 'SELECT password FROM users,bidders WHERE users.email=? AND users.email=bidders.email',
@@ -113,7 +121,8 @@ def sellerMainPage():
     vendor = cursor.fetchone()
     if vendor:
         data['business_name'] = vendor[0]
-        data['business_address'] = str(vendor[1]) + " " + vendor[2] + ", " + vendor[3] + ", " + vendor[4] + " " + str(vendor[5])
+        data['business_address'] = str(vendor[1]) + " " + vendor[2] + ", " + vendor[3] + ", " + vendor[4] + " " + str(
+            vendor[5])
         data['customer_service'] = vendor[6]
 
     return render_template('sellerMain.html', data=data)
@@ -149,17 +158,18 @@ def auctionListingsPage():
 
     # On button press
     if request.method == 'POST':
+        # Get category
         if request.form['button'] == 'Submit':
-            # Get category
             category = request.form['category']
             listings = getAuctionListings(category)
             data['listings'] = listings
-            if category == 'Root': category = 'All'
+            if category == 'Root':
+                category = 'All'
             data['category'] = category
             return render_template('auctionListings.html', data=data)
 
+        # Redirect to page to bid and get more info
         else:
-            # Redirect to page to bid and get more info
             session['listing_ID'] = request.form['button']
             return redirect("/bid")
 
@@ -184,21 +194,71 @@ def bidStatusPage():
 def bidPage():
     listing_ID = session.get('listing_ID')
 
+    # TODO: Implement bidding button
+
     return render_template('bid.html', data=getAuctionInfo(listing_ID))
 
 
 # Seller Auction Status Page
 @app.route('/auctionStatus', methods=['GET', 'POST'])
 def auctionStatusPage():
+    username = session.get('username')
+
     # Create data list for page
-    data = {"listings": (),
-            "categories": ()
+    data = {"listings": getSellerAuctions(username),
+            "categories": getAllCategories()
             }
+
+    # On button press
+    if request.method == 'POST':
+        # Create new auction
+        if 'confirm_add_button' in request.form:
+            Seller_Email = username
+            Category = request.form['category']
+            Auction_Title = request.form['Auction_Title']
+            Product_Name = request.form['Product_Name']
+            Product_Description = request.form['Product_Description']
+            Quantity = request.form['Quantity']
+            Reserve_Price = request.form['Reserve_Price']
+            Max_bids = request.form['Max_Bid']
+            newAuction(Seller_Email, Category, Auction_Title, Product_Name, Product_Description, Quantity,
+                       Reserve_Price, Max_bids)
+
+        # Set auction as active
+        elif 'confirm_activate_button' in request.form:
+            Listing_ID = request.form['confirm_activate_button']
+            setActive(Listing_ID)
+
+        # Set auction as inactive
+        elif 'confirm_deactivate_button' in request.form:
+            Listing_ID = request.form['confirm_deactivate_button']
+            Reason = request.form['Reason']
+            setInactive(Listing_ID, Reason)
+
+        # Edit auction
+        elif 'confirm_edit_button' in request.form:
+            Listing_ID = request.form['confirm_edit_button']
+            Category = request.form['category']
+            Auction_Title = request.form['Auction_Title']
+            Product_Name = request.form['Product_Name']
+            Product_Description = request.form['Product_Description']
+            Quantity = request.form['Quantity']
+            Reserve_Price = request.form['Reserve_Price']
+            Max_bids = request.form['Max_Bid']
+            editAuction(Listing_ID, Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price,
+                        Max_bids)
+
+        # Update page
+        data['listings'] = getSellerAuctions(username)
+        return render_template('auctionStatus.html', data=data)
 
     return render_template('auctionStatus.html', data=data)
 
 
-# Gets auction_listings in given category and subcategories
+# <----------------------------------------- Helper Functions ----------------------------------------->
+
+
+# Gets auction listings in given category and subcategories
 def getAuctionListings(category):
     listings = []
 
@@ -232,6 +292,21 @@ def getAuctionListings(category):
     return listings
 
 
+# Gets all sellers posted auctions
+def getSellerAuctions(user):
+    listings = []
+
+    # Get auctions
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT Listing_ID FROM auction_listings WHERE Seller_Email=? ORDER BY Status', (user,))
+    listing = cursor.fetchall()
+    if listing:
+        for auction in listing:
+            listings.append(getAuctionInfo(auction[0]))
+
+    return listings
+
+
 # Gets auctions the user had bids on
 def getBids(user):
     bidsList = []
@@ -242,15 +317,13 @@ def getBids(user):
                                 'AND bids.Bidder_email=? GROUP BY bids.Listing_ID', (user,))
     bids = cursor.fetchall()
     if bids:
-        for bid in bids:
-            bidsList.append(getAuctionInfo(bid[0]))
+        for b in bids:
+            bidsList.append(getAuctionInfo(b[0]))
     return bidsList
 
 
 # Gets all information of a given auction
 def getAuctionInfo(Listing_ID):
-    auctionInfo = ()
-
     connection = sql.connect('database.db')
     # Gets auction details
     cursor = connection.execute('SELECT auction_listings.* FROM auction_listings '
@@ -261,12 +334,14 @@ def getAuctionInfo(Listing_ID):
                                 'WHERE Listing_ID = ? AND Bidder_email=? GROUP BY Listing_ID',
                                 (Listing_ID, session.get('username'),))
     info2 = cursor.fetchone()
-    if info2 is None: info2 = ('No Bids',)
+    if info2 is None:
+        info2 = ('No Bids',)
     # Gets highest bid in auction
     cursor = connection.execute('SELECT max(Bid_price) FROM bids '
                                 'WHERE Listing_ID = ? GROUP BY Listing_ID', (Listing_ID,))
     info3 = cursor.fetchone()
-    if info3 is None: info3 = ('No Bids',)
+    if info3 is None:
+        info3 = ('No Bids',)
 
     # Get remaining bids
     cursor = connection.execute('SELECT count(Bid_ID) FROM bids '
@@ -294,6 +369,78 @@ def getCategories():
             categories.append(row[0])
 
     return categories
+
+
+# Gets all categories in database
+def getAllCategories():
+    categories = []
+
+    # Get categories
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT category_name FROM categories')
+    categoryRows = cursor.fetchall()
+    for row in categoryRows:
+        categories.append(row[0])
+
+    return categories
+
+
+# Set auction as active
+def setActive(Listing_ID):
+    # Set as active
+    connection = sql.connect('database.db')
+    connection.execute('UPDATE auction_listings SET Status=?, Remove_Reason=? WHERE Listing_ID=?', (1, "", Listing_ID,))
+    connection.commit()
+    return
+
+
+# Set auction as inactive
+def setInactive(Listing_ID, reason):
+    # Set as inactive
+    connection = sql.connect('database.db')
+    connection.execute('UPDATE auction_listings SET Status=?, Remove_Reason=? WHERE Listing_ID=?',
+                       (0, reason, Listing_ID))
+    connection.commit()
+    return
+
+
+# Create new auction
+def newAuction(Seller_Email, Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price,
+               Max_bids):
+    # Create new Listing_ID
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT max(Listing_ID) FROM auction_listings')
+    maxListingID = cursor.fetchone()[0]
+    newListingID = maxListingID + 1
+
+    connection.execute('INSERT INTO auction_listings '
+                       '(Seller_Email, Listing_ID, Category, Auction_Title, Product_Name, Product_Description, '
+                       'Quantity, Reserve_Price, Max_bids, Status, Remove_Reason) '
+                       'VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+                       (Seller_Email, newListingID, Category, Auction_Title, Product_Name,
+                        Product_Description, Quantity, Reserve_Price, Max_bids, 1, ""))
+    connection.commit()
+    return
+
+
+# Edit an existing auction
+def editAuction(Listing_ID, Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price,
+                Max_bids):
+    # Update listing
+    connection = sql.connect('database.db')
+    connection.execute('UPDATE auction_listings SET '
+                       '(Category, Auction_Title, Product_Name, Product_Description, '
+                       'Quantity, Reserve_Price, Max_bids) = (?,?,?,?,?,?,?) WHERE Listing_ID=?',
+                       (Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price, Max_bids,
+                        Listing_ID))
+    connection.commit()
+    return
+
+
+# Place a new bid
+def placeBid(user, Listing_ID, bidAmount):
+    # TODO
+    return
 
 
 if __name__ == "__main__":
