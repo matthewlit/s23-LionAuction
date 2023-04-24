@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../static/css/mystyle.css">
+    <title>Auction Status</title>
+</head>
+<body>
+<!--Header-->
+<div class="header">
+    <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 90%" href="/" role="button">Sign Out</a>
+    <button class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" role="button" onclick="history.back()">Back</button>
+    <h1>Lion Auction</h1>
+</div>
+
+<!--Contents-->
+<div class="content">
+    <!--New Auction-->
+    <h2 style="text-align: center">Create New Auction:</h2>
+    <table style="width: 90%;">
+        <tr>
+            <th scope="col"> Auction Title</th>
+            <th scope="col"> Product Name</th>
+            <th scope="col"> Product Description</th>
+            <th scope="col"> Category</th>
+            <th scope="col"> Quantity</th>
+            <th scope="col"> Reserve Price</th>
+            <th scope="col"> Max Bid</th>
+            <th scope="col"> </th>
+        </tr>
+        <tbody>
+            <tr>
+                <form method="post">
+                <td><input type="text" id="Auction_Title" name="Auction_Title" required class="form-control"></td>
+                <td><input type="text" id="Auction_Name" name="Auction_Name" required class="form-control"></td>
+                <td><input type="text" id="Auction_Description" name="Auction_Description" required class="form-control"></td>
+                <td>
+                    <select name="category" id="category">
+                    {%  for category in data.categories %}
+                        <option value="{{ category }}">{{ category }}</option>
+                    {%  endfor %}
+                    </select>
+                </td>
+                <td><input size="3" type="number" id="Quantity" name="Quantity" required class="form-control"></td>
+                <td><input size="6" type="number" id="Reserve_Price" name="Reserve_Price" required class="form-control"></td>
+                <td><input size="3" type="number" id="Max_Bid" name="Max_Bid" required class="form-control"></td>
+                <td><button type="submit" class="buttonSmall" name="submit_button" value="add">Add</button></td>
+                </form>
+            </tr>
+        </tbody>
+    </table>
+
+    <!--Auction Status-->
+    <h2 style="text-align: center">Auction Status:</h2>
+    <table style="width: 90%;">
+        <tr>
+            <th scope="col"> Auction Title</th>
+            <th scope="col"> Status</th>
+            <th scope="col"> Remaining Bids</th>
+            <th scope="col"> Highest Bid</th>
+            <th scope="col"> </th>
+        </tr>
+        <tbody>
+        {% for auction in data.listings%}
+            <tr>
+                <td> {{ auction[3] }} </td>
+                <td> ${{ auction[13] }}</td>
+                <td> ${{ auction[12] }}</td>
+                {% if auction[9]==0 %}
+                <td> Inactive </td>
+                <td><form method="post">
+                <button type="submit" class="buttonSmall" name="edit_button" value=" {{ auction[1] }}">Edit</button>
+                <button type="submit" class="buttonSmall" name="active_button" value=" {{ auction[1] }}">Activate</button>
+                </form></td>
+                {% elif auction[9]==1 %}
+                <td> Active </td>
+                <td><form method="post">
+                <button type="submit" class="buttonSmall" name="edit_button" value=" {{ auction[1] }}">Edit</button>
+                <button type="submit" class="buttonSmall" name="active_button" value=" {{ auction[1] }}">Deactivate</button>
+                </form></td>
+                {% elif auction[9]==2 %}
+                <td> Sold </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

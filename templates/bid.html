@@ -56,15 +56,16 @@
             </tr>
              <tr>
                 <th scope="row"> Highest Bid</th>
-                <td> {{ data[11] }} </td>
+                <td> ${{ data[12] }} </td>
             </tr>
              <tr>
                 <th scope="row"> Your Bid</th>
-                <td> {{ data[10] }} </td>
+                <td> ${{ data[11] }} </td>
             </tr>
         </table>
 
         <!--Bid Button-->
+        {% if data[9]==1 %}
         <div class="form" style="display: inline-block; vertical-align: middle;">
             <form action="" method="post">
                 <label for="bidAmount">Bid Amount:</label><br>
@@ -73,6 +74,7 @@
                 <div style="padding: 25px; font-size: 20px" id="error">{{ error }}</div>
             </form>
         </div>
+        {% endif %}
     </div>
 </div>
 </body>

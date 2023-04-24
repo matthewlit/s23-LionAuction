@@ -173,7 +173,7 @@ def bidStatusPage():
 
     if request.method == 'POST':
         # Redirect to page to bid and get more info
-        session['listing_ID'] = request.form['bid_button']
+        session['listing_ID'] = request.form['button']
         return redirect("/bid")
 
     return render_template('bidStatus.html', data=getBids(username))
@@ -187,6 +187,17 @@ def bidPage():
     return render_template('bid.html', data=getAuctionInfo(listing_ID))
 
 
+# Seller Auction Status Page
+@app.route('/auctionStatus', methods=['GET', 'POST'])
+def auctionStatusPage():
+    # Create data list for page
+    data = {"listings": (),
+            "categories": ()
+            }
+
+    return render_template('auctionStatus.html', data=data)
+
+
 # Gets auction_listings in given category and subcategories
 def getAuctionListings(category):
     listings = []
@@ -197,7 +208,7 @@ def getAuctionListings(category):
     categories = cursor.fetchall()
 
     # Add listings in parent category
-    cursor = connection.execute('SELECT Listing_ID FROM auction_listings WHERE Category=?', (category,))
+    cursor = connection.execute('SELECT Listing_ID FROM auction_listings WHERE Category=? AND Status=1', (category,))
     listing = cursor.fetchall()
     if listing:
         for auction in listing:
@@ -212,7 +223,7 @@ def getAuctionListings(category):
                 categories.append(cat)
 
         # Add listings in category
-        cursor = connection.execute('SELECT Listing_ID FROM auction_listings WHERE Category=?', (row[0],))
+        cursor = connection.execute('SELECT Listing_ID FROM auction_listings WHERE Category=? AND Status=1', (row[0],))
         listing = cursor.fetchall()
         if listing:
             for auction in listing:
@@ -257,7 +268,13 @@ def getAuctionInfo(Listing_ID):
     info3 = cursor.fetchone()
     if info3 is None: info3 = ('No Bids',)
 
-    auctionInfo = info1 + info2 + info3
+    # Get remaining bids
+    cursor = connection.execute('SELECT count(Bid_ID) FROM bids '
+                                'WHERE Listing_ID = ?', (Listing_ID,))
+    numBids = cursor.fetchone()
+    info4 = (info1[8] - numBids[0],)
+
+    auctionInfo = info1 + info2 + info3 + info4
 
     return auctionInfo
 
@@ -272,7 +289,7 @@ def getCategories():
     categoryRows = cursor.fetchall()
     for row in categoryRows:
         # Check if category has listings
-        cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=?', (row[0],))
+        cursor = connection.execute('SELECT * FROM auction_listings WHERE Category=? AND Status=1', (row[0],))
         if cursor.fetchone():
             categories.append(row[0])
 

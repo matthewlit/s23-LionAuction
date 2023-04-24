@@ -149,6 +149,7 @@ def populate_auction_listings_DB():
     connection.execute('CREATE TABLE IF NOT EXISTS auction_listings('
                        'Seller_Email TEXT, Listing_ID INTEGER, Category TEXT, Auction_Title TEXT, Product_Name TEXT, '
                        'Product_Description TEXT, Quantity INTEGER, Reserve_Price INTEGER, Max_bids INTEGER, Status INTEGER,'
+                       'Remove_Reason TEXT,'
                        'PRIMARY KEY (Seller_Email, Listing_ID),'
                        'FOREIGN KEY (Seller_Email) REFERENCES sellers(email));')
     connection.commit()
@@ -174,11 +175,11 @@ def populate_auction_listings_DB():
             result = cursor.fetchone()
             if not result:
                 connection.execute('INSERT INTO auction_listings '
-                                   '(Seller_Email, Listing_ID, Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price, Max_bids, Status) '
-                                   'VALUES (?,?,?,?,?,?,?,?,?,?)',
+                                   '(Seller_Email, Listing_ID, Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price, Max_bids, Status, Remove_Reason) '
+                                   'VALUES (?,?,?,?,?,?,?,?,?,?,?)',
                                    (Seller_Email, Listing_ID, Category, Auction_Title, Product_Name,
                                     Product_Description,
-                                    Quantity, Reserve_Price, Max_bids, Status))
+                                    Quantity, Reserve_Price, Max_bids, Status,""))
                 connection.commit()
             parsed_entries += 1
             print('', end='\rAuction Listings table: ' + str(parsed_entries) + '/' + str(total_entries))

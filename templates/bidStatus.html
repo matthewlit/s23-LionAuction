@@ -21,25 +21,29 @@
     <table style="width: 90%;">
         <tr>
             <th scope="col"> Auction Title</th>
-            <th scope="col"> Status</th>
             <th scope="col"> Your Bid</th>
             <th scope="col"> Highest Bid</th>
+            <th scope="col"> Remaining Bids</th>
+            <th scope="col"> Status</th>
             <th scope="col"> </th>
         </tr>
         <tbody>
         {% for auction in data%}
             <tr>
                 <td> {{ auction[3] }} </td>
+                <td> ${{ auction[11] }}</td>
+                <td> ${{ auction[12] }}</td>
+                <td> {{ auction[13] }} </td>
                 {% if auction[9]==0 %}
                 <td> Inactive </td>
+                <td><form method="post"><button type="submit" class="buttonSmall" name="button" value=" {{ auction[1] }}">More Info</button></form></td>
                 {% elif auction[9]==1 %}
                 <td> Active </td>
+                <td><form method="post"><button type="submit" class="buttonSmall" name="button" value=" {{ auction[1] }}">More Info / Bid</button></form></td>
                 {% elif auction[9]==2 %}
                 <td> Sold </td>
+                <td><form method="post"><button type="submit" class="buttonSmall" name="button" value=" {{ auction[1] }}">More Info</button></form></td>
                 {% endif %}
-                <td> ${{ auction[10] }}</td>
-                <td> ${{ auction[11] }}</td>
-                <td><form method="post"><button type="submit" class="buttonSmall" name="bid_button" value=" {{ auction[1] }}">More Info / Bid</button></form></td>
             </tr>
         {% endfor %}
         </tbody>

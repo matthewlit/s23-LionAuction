@@ -17,7 +17,7 @@
 <!--Contents-->
 <div class="content">
     <!--Auction Listings-->
-    <h2 style="text-align: center">Auction Listings: {{ data.category }}</h2>
+    <h2 style="text-align: center">Active Auction Listings: {{ data.category }}</h2>
     <form style="text-align: center" classaction="" method="post">
         <label>Select Category:</label>
         <select name="category" id="category">
@@ -34,8 +34,8 @@
             <th scope="col"> Auction Title</th>
             <th scope="col"> Product Name</th>
             <th scope="col"> Quantity</th>
-            <th scope="col"> Status</th>
-            <th scope="col"> Highest_Bid</th>
+            <th scope="col"> Highest Bid</th>
+            <th scope="col"> Remaining Bids</th>
             <th scope="col"> </th>
         </tr>
         <tbody>
@@ -44,19 +44,13 @@
                 <td> {{ auction[3] }} </td>
                 <td> {{ auction[4] }} </td>
                 <td> {{ auction[6] }} </td>
-                {% if auction[9]==0 %}
-                <td> Inactive </td>
-                {% elif auction[9]==1 %}
-                <td> Active </td>
-                {% elif auction[9]==2 %}
-                <td> Sold </td>
-                {% endif %}
-                {% if auction[11]=='No Bids' %}
-                <td> {{ auction[11] }} </td>
+                {% if auction[12]=='No Bids' %}
+                <td> {{ auction[12] }} </td>
                 {% else %}
-                <td> ${{ auction[11] }} </td>
+                <td> ${{ auction[12] }} </td>
                 {% endif %}
-                <td><form method="post"><button type="submit" class="buttonSmall" name="bid_button" value=" {{ auction[1] }}">More Info / Bid</button></form></td>
+                <td> {{ auction[13] }} </td>
+                <td><form method="post"><button type="submit" class="buttonSmall" name="button" value=" {{ auction[1] }}">More Info / Bid</button></form></td>
             </tr>
         {% endfor %}
         </tbody>
