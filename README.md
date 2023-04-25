@@ -16,13 +16,13 @@ The Phase 2 System Prototype for Lion Auction. Allows a registered user to log i
 
 - **Welcome Page:** Displays a user's relevant information depending on roll. Contains buttons to navigate to other relevant operation for the signed in roll. Sign out button returns user back to `Login Page`
 
-- **Auction Listings Page:** Displays all active auction listings for bidders to browse. Bidders can browse by categories to find more specific auctions. Each auction has a option to go to the `Bid Page` for more information on the auction and place a bid.
+- **Auction Listings Page:** Displays all active auction listings for bidders to browse. Bidders can browse by categories to find more specific auctions. Each auction has an option to go to the `Bid Page` for more information on the auction and place a bid.
 
-- **Bid Status Page:** Displays all auction listings the bidder has a bid on and their current status, including if the bidder won the auction. All auctions have a option to go to the `Bid Page` for more information on the auction and place a bid if it is active.
+- **Bid Status Page:** Displays all auction listings the bidder has a bid on and their current status, including if the bidder won the auction. All auctions have an option to go to the `Bid Page` for more information on the auction and place a bid if it is active.
 
-- **Bid Page:** Displays all relevant information for the current auction the bidder is viewing. If the auction is active the bidder has the option to place a bid on the item that is $1 higher then the highest bid. If there is no bids then the bid must be at least the auctions reserve price. If the bidder places the highest bid when max bids is reached they win the auction.
+- **Bid Page:** Displays all relevant information for the current auction the bidder is viewing. If the auction is active the bidder has the option to place a bid on the item that is $1 higher than the highest bid. If there is no bids then the bid must be at least the auctions reserve price. If the bidder places the highest bid when max bids is reached they win the auction.
 
-- **Auction Status Page:** Displays all auctions a seller has created. Gives the seller the option to edit, activate, deactivate, and complete transactions on auctions depending on their status. Also includes a section for a seller to create a new auction listing to put up for bidding.
+- **Auction Status Page:** Displays all auctions a seller has created. Gives the seller the option to edit, activate, deactivate, and complete transactions on auctions depending on their status. Once a transaction is complete a seller can see the winners contact and shipping information. Also includes a section for a seller to create a new auction listing to put up for bidding.
 
 - **Database:** Contains tables outlined in `RelationalSchema.pdf` populated with the data from `LionAuctionDataset`. Tables are stored in `database.db`.
 

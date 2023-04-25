@@ -104,8 +104,8 @@
                 <td> Sold </td>
                 <td><button type="button" class="buttonSmall" name="complete_button" value="{{ auction[1] }}" data-toggle="modal" data-target="#{{ auction[1] }}completemodal">Complete Transaction</button></td>
                 {% elif auction[9]==2 and auction[15]==1%}
-                <td> Sold </td>
                 <td> Transaction Complete </td>
+                <td><button type="button" class="buttonSmall" name="info_button" value="{{ auction[1] }}" data-toggle="modal" data-target="#{{ auction[1] }}infomodal">Winner Info</button></td>
                 {% endif %}
 
                 <!--Bootstrap Modal for edit button-->
@@ -174,6 +174,7 @@
                   </div>
                 </div>
 
+                {% if auction[15]==0 %}
                 <!--Bootstrap Modal for complete transaction button-->
                 <div class="modal fade" id="{{ auction[1] }}completemodal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
                   <div class="modal-dialog modal-sm" role="document">
@@ -190,6 +191,24 @@
                     </div>
                   </div>
                 </div>
+                {% endif %}
+
+                {% if auction[15]==1 %}
+                <!--Bootstrap Modal for winner info button-->
+                <div class="modal fade" id="{{ auction[1] }}infomodal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content" align="center">
+                      <div class="modal-body" style="background-color: #15447B">
+                          <h2 class="modal-title" id="modalLabel">Winner Info:</h2><br>
+                          <label>Name: {{ auction[16] }}</label><br>
+                          <label>Email: {{ auction[17] }}</label><br>
+                          <label>Address: {{ auction[18] }}</label><br><br>
+                          <button type="button" class="buttonSmall" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

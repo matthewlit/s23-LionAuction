@@ -235,7 +235,7 @@ def auctionStatusPage():
 
     # Create data list for page
     data = {"listings": getSellerAuctions(username),
-            "categories": getAllCategories()
+            "categories": getAllCategories(),
             }
 
     # On button press
@@ -384,7 +384,7 @@ def getAuctionInfo(Listing_ID):
     info4 = (info1[8] - numBids[0],)
 
     # If winner
-    info5 = ('No winner',)
+    info5 = ('No winner', 0)
     if info1[9] == 2:
         # Get winner
         cursor = connection.execute('SELECT Bidder_email,max(Bid_price) FROM bids '
@@ -396,7 +396,7 @@ def getAuctionInfo(Listing_ID):
         cursor = connection.execute('SELECT * FROM transactions WHERE Listing_ID = ?', (Listing_ID,))
         if cursor.fetchone():
             complete = 1
-        info5 = (winner, complete)
+        info5 = (winner, complete) + getWinnerInfo(winner)
 
     auctionInfo = info1 + info2 + info3 + info4 + info5
 
@@ -544,6 +544,23 @@ def completeTransaction(Listing_ID):
     connection.commit()
 
     return
+
+
+# Get info on an auction winner
+def getWinnerInfo(user):
+    connection = sql.connect('database.db')
+    cursor = connection.execute(
+        'SELECT first_name,last_name,street_num,street_name,city,state,address.zipcode '
+        'FROM bidders,address,zipcode_info '
+        'WHERE email=? '
+        'AND bidders.home_address_id=address.address_ID '
+        'AND address.zipcode=zipcode_info.zipcode ',
+        (user, ))
+    info = cursor.fetchone()
+    userInfo = (info[0] + " " + info[1], user,
+                              str(info[2]) + " " + info[3] + ", " + info[4] + ", " + info[
+                                  5] + " " + str(info[6]))
+    return userInfo
 
 
 if __name__ == "__main__":
