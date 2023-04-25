@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, session, redirect
 from flask_session import Session
 import sqlite3 as sql
 import bcrypt
+import datetime
 
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
@@ -98,7 +99,7 @@ def sellerMainPage():
     username = session.get('username')
     connection = sql.connect('database.db')
     cursor = connection.execute(
-        'SELECT bank_routing_number, bank_account_number FROM sellers WHERE email=?', (username,))
+        'SELECT bank_routing_number, bank_account_number, balance FROM sellers WHERE email=?', (username,))
     userInfo = cursor.fetchone()
 
     # Create data list for page
@@ -106,6 +107,7 @@ def sellerMainPage():
             "roll": "Seller",
             "bank_routing_number": userInfo[0],
             "bank_account_number": userInfo[1],
+            "balance": userInfo[2],
             "business_name": None,
             "business_address": None,
             "customer_service": None
@@ -206,11 +208,13 @@ def bidPage():
     # Add minimum bid amount
     if data['info'][12] != 'No Bids':
         data['minimumBid'] = (data['info'][12]) + 1
+    else:
+        data['minimumBid'] = (data['info'][7])
 
     # On bid button press
     if request.method == 'POST':
         bidAmount = int(request.form['bidAmount'])
-        if data['info'][12] == 'No Bids' or bidAmount >= data['minimumBid']:
+        if bidAmount >= data['minimumBid']:
             # Place bid
             placeBid(username, listing_ID, bidAmount)
 
@@ -272,6 +276,11 @@ def auctionStatusPage():
             Max_bids = request.form['Max_Bid']
             editAuction(Listing_ID, Category, Auction_Title, Product_Name, Product_Description, Quantity, Reserve_Price,
                         Max_bids)
+
+        # Complete Transaction:
+        elif 'confirm_complete_button' in request.form:
+            Listing_ID = request.form['confirm_complete_button']
+            completeTransaction(Listing_ID)
 
         # Update page
         data['listings'] = getSellerAuctions(username)
@@ -377,9 +386,17 @@ def getAuctionInfo(Listing_ID):
     # If winner
     info5 = ('No winner',)
     if info1[9] == 2:
+        # Get winner
         cursor = connection.execute('SELECT Bidder_email,max(Bid_price) FROM bids '
                                     'WHERE Listing_ID = ? GROUP BY Listing_ID', (Listing_ID,))
-        info5 = (cursor.fetchone()[0],)
+        winner = cursor.fetchone()[0]
+
+        # Get if transaction complete
+        complete = 0
+        cursor = connection.execute('SELECT * FROM transactions WHERE Listing_ID = ?', (Listing_ID,))
+        if cursor.fetchone():
+            complete = 1
+        info5 = (winner, complete)
 
     auctionInfo = info1 + info2 + info3 + info4 + info5
 
@@ -445,6 +462,7 @@ def newAuction(Seller_Email, Category, Auction_Title, Product_Name, Product_Desc
     maxListingID = cursor.fetchone()[0]
     newListingID = maxListingID + 1
 
+    # Add to auction listings
     connection.execute('INSERT INTO auction_listings '
                        '(Seller_Email, Listing_ID, Category, Auction_Title, Product_Name, Product_Description, '
                        'Quantity, Reserve_Price, Max_bids, Status, Remove_Reason) '
@@ -480,6 +498,7 @@ def placeBid(user, Listing_ID, bidAmount):
     maxBidID = cursor.fetchone()[0]
     Bid_ID = maxBidID + 1
 
+    # Add to bid table
     connection.execute('INSERT INTO bids (Bid_ID, Seller_Email, Listing_ID, Bidder_email, Bid_price) '
                        'VALUES (?,?,?,?,?)', (Bid_ID, info[0], Listing_ID, user, bidAmount))
     connection.commit()
@@ -490,6 +509,39 @@ def placeBid(user, Listing_ID, bidAmount):
         connection.execute('UPDATE auction_listings SET Status=?, Remove_Reason=? WHERE Listing_ID=?',
                            (2, "", Listing_ID,))
         connection.commit()
+
+    return
+
+
+# Complete transaction
+def completeTransaction(Listing_ID):
+    # Get auction info
+    info = getAuctionInfo(Listing_ID)
+
+    # Create new Transaction_ID
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT max(Bid_ID) FROM bids')
+    maxTransactionID = cursor.fetchone()[0]
+    Transaction_ID = maxTransactionID + 1
+
+    # Get date
+    current_time = datetime.datetime.now()
+    date = str(current_time.month) + "/" + str(current_time.day) + "/" + str(current_time.year)
+
+    # Insert into transactions table
+    connection.execute(
+        'INSERT INTO transactions (Transaction_ID, Seller_Email, Listing_ID, Buyer_Email, Date, Payment) '
+        'VALUES (?,?,?,?,?,?)', (Transaction_ID, info[0], Listing_ID, info[14], date, info[12]))
+    connection.commit()
+
+    # ***Charge bidder credit card***
+
+    # Add Payment to sellers balance
+    cursor = connection.execute('SELECT balance FROM sellers WHERE email=?', (info[0],))
+    balance = (cursor.fetchone()[0]) + info[12]
+    connection.execute('UPDATE sellers SET balance=? WHERE email=?',
+                       (balance, info[0],))
+    connection.commit()
 
     return
 

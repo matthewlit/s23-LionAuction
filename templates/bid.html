@@ -88,7 +88,7 @@
         <div class="form" style="display: inline-block; vertical-align: middle;">
             <form action="" method="post">
                 <label for="bidAmount">Bid Amount:</label><br>
-                <input type="number" id="bidAmount" name="bidAmount" required class="form-control" min="{% if data.info[12]=='No Bids' %}1{% else %}{{ data.minimumBid }}{% endif %}"><br>
+                <input type="number" id="bidAmount" name="bidAmount" required class="form-control" min="{{ data.minimumBid }}"><br>
                 <button type="button" class="buttonBig" data-toggle="modal" data-target="#bidmodal">Submit Bid</button><br>
                 <div style="padding: 25px;" id="error">{{ error }}</div>
 

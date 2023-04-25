@@ -100,9 +100,12 @@
                 <button type="button" class="buttonSmall" name="edit_button" value="{{ auction[1] }}" data-toggle="modal" data-target="#{{ auction[1] }}editmodal">Edit</button>
                 <button type="button" class="buttonSmall" name="deactivate_button" value="{{ auction[1] }}" data-toggle="modal" data-target="#{{ auction[1] }}deactivatemodal">Deactivate</button>
                 </td>
-                {% elif auction[9]==2 %}
+                {% elif auction[9]==2 and auction[15]==0%}
                 <td> Sold </td>
-                <td></td>
+                <td><button type="button" class="buttonSmall" name="complete_button" value="{{ auction[1] }}" data-toggle="modal" data-target="#{{ auction[1] }}completemodal">Complete Transaction</button></td>
+                {% elif auction[9]==2 and auction[15]==1%}
+                <td> Sold </td>
+                <td> Transaction Complete </td>
                 {% endif %}
 
                 <!--Bootstrap Modal for edit button-->
@@ -165,6 +168,23 @@
                           <form method="post">
                           <button type="button" class="buttonSmall" data-dismiss="modal">Cancel</button>
                           <button type="submit" class="buttonSmall" name="confirm_activate_button" value="{{ auction[1] }}">Confirm</button>
+                          </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!--Bootstrap Modal for complete transaction button-->
+                <div class="modal fade" id="{{ auction[1] }}completemodal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content" align="center">
+                      <div class="modal-body" style="background-color: #15447B">
+                          <h2 class="modal-title" id="modalLabel">Complete Transaction:</h2><br>
+                          <form method="post">
+                          <label>Winning Bidder: {{ auction[14] }}</label><br>
+                          <label>Winning Bid: ${{ auction[12] }}</label><br><br>
+                          <button type="button" class="buttonSmall" data-dismiss="modal">Cancel</button>
+                          <button type="submit" class="buttonSmall" name="confirm_complete_button" value="{{ auction[1] }}">Confirm</button>
                           </form>
                       </div>
                     </div>
