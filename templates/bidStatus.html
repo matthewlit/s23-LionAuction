@@ -10,7 +10,7 @@
 <!--Header-->
 <div class="header">
     <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 90%" href="/" role="button">Sign Out</a>
-    <button class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" role="button" onclick="history.back()">Back</button>
+    <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" href="/bidderMain" role="button">Back</a>
     <h1>Lion Auction</h1>
 </div>
 
@@ -28,7 +28,7 @@
             <th scope="col"> </th>
         </tr>
         <tbody>
-        {% for auction in data%}
+        {% for auction in data.listings%}
             <tr>
                 <td> {{ auction[3] }} </td>
                 <td> ${{ auction[11] }}</td>
@@ -40,8 +40,11 @@
                 {% elif auction[9]==1 %}
                 <td> Active </td>
                 <td><form method="post"><button type="submit" class="buttonSmall" name="button" value=" {{ auction[1] }}">More Info / Bid</button></form></td>
-                {% elif auction[9]==2 %}
+                {% elif auction[9]==2 and auction[14]!=data.username%}
                 <td> Sold </td>
+                <td><form method="post"><button type="submit" class="buttonSmall" name="button" value=" {{ auction[1] }}">More Info</button></form></td>
+                {% elif auction[9]==2 and auction[14]==data.username%}
+                <td> You Won! </td>
                 <td><form method="post"><button type="submit" class="buttonSmall" name="button" value=" {{ auction[1] }}">More Info</button></form></td>
                 {% endif %}
             </tr>

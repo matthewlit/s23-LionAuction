@@ -10,7 +10,7 @@
 <!--Header-->
 <div class="header">
     <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 90%" href="/" role="button">Sign Out</a>
-    <button class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" role="button" onclick="history.back()">Back</button>
+    <a class="buttonBig" style="position: fixed; margin: 20px 20px 20px 2%" href="/bidderMain" role="button">Back</a>
     <h1>Lion Auction</h1>
 </div>
 
@@ -21,7 +21,7 @@
     <form style="text-align: center" classaction="" method="post">
         <label>Select Category:</label>
         <select name="category" id="category">
-            <option value=""></option>
+            <option value="" selected hidden>Select</option>
             <option value="Root">All</option>
             {%  for category in data.categories %}
                 <option value="{{ category }}">{{ category }}</option>

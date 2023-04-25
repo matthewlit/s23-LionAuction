@@ -181,22 +181,47 @@ def auctionListingsPage():
 def bidStatusPage():
     username = session.get('username')
 
+    data = {"username": username,
+            "listings": getBids(username)
+            }
+
     if request.method == 'POST':
         # Redirect to page to bid and get more info
         session['listing_ID'] = request.form['button']
         return redirect("/bid")
 
-    return render_template('bidStatus.html', data=getBids(username))
+    return render_template('bidStatus.html', data=data)
 
 
 # Bidding Page
 @app.route('/bid', methods=['GET', 'POST'])
 def bidPage():
     listing_ID = session.get('listing_ID')
+    username = session.get('username')
 
-    # TODO: Implement bidding button
+    data = {"username": username,
+            "info": getAuctionInfo(listing_ID)
+            }
 
-    return render_template('bid.html', data=getAuctionInfo(listing_ID))
+    # Add minimum bid amount
+    if data['info'][12] != 'No Bids':
+        data['minimumBid'] = (data['info'][12]) + 1
+
+    # On bid button press
+    if request.method == 'POST':
+        bidAmount = int(request.form['bidAmount'])
+        if data['info'][12] == 'No Bids' or bidAmount >= data['minimumBid']:
+            # Place bid
+            placeBid(username, listing_ID, bidAmount)
+
+            # Update data
+            data = {"username": username, "info": getAuctionInfo(listing_ID), 'minimumBid': bidAmount + 1}
+
+            return render_template('bid.html', data=data, error='Placed $' + str(bidAmount) + ' bid')
+        else:
+            return render_template('bid.html', data=data, error='Invalid Amount')
+
+    return render_template('bid.html', data=data)
 
 
 # Seller Auction Status Page
@@ -349,7 +374,14 @@ def getAuctionInfo(Listing_ID):
     numBids = cursor.fetchone()
     info4 = (info1[8] - numBids[0],)
 
-    auctionInfo = info1 + info2 + info3 + info4
+    # If winner
+    info5 = ('No winner',)
+    if info1[9] == 2:
+        cursor = connection.execute('SELECT Bidder_email,max(Bid_price) FROM bids '
+                                    'WHERE Listing_ID = ? GROUP BY Listing_ID', (Listing_ID,))
+        info5 = (cursor.fetchone()[0],)
+
+    auctionInfo = info1 + info2 + info3 + info4 + info5
 
     return auctionInfo
 
@@ -439,7 +471,26 @@ def editAuction(Listing_ID, Category, Auction_Title, Product_Name, Product_Descr
 
 # Place a new bid
 def placeBid(user, Listing_ID, bidAmount):
-    # TODO
+    # Get auction info
+    info = getAuctionInfo(Listing_ID)
+
+    # Create new Bid_ID
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT max(Bid_ID) FROM bids')
+    maxBidID = cursor.fetchone()[0]
+    Bid_ID = maxBidID + 1
+
+    connection.execute('INSERT INTO bids (Bid_ID, Seller_Email, Listing_ID, Bidder_email, Bid_price) '
+                       'VALUES (?,?,?,?,?)', (Bid_ID, info[0], Listing_ID, user, bidAmount))
+    connection.commit()
+
+    # Checks if bid is over
+    if info[13] == 1:
+        # Set as sold
+        connection.execute('UPDATE auction_listings SET Status=?, Remove_Reason=? WHERE Listing_ID=?',
+                           (2, "", Listing_ID,))
+        connection.commit()
+
     return
 
 
