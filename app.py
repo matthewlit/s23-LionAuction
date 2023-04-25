@@ -170,6 +170,14 @@ def auctionListingsPage():
             data['category'] = category
             return render_template('auctionListings.html', data=data)
 
+        elif request.form['button'] == 'Search':
+            # Get like results
+            search = request.form['search']
+            listings = getLikeAuctionListings(search)
+            data['listings'] = listings
+            data['category'] = search
+            return render_template('auctionListings.html', data=data)
+
         # Redirect to page to bid and get more info
         else:
             session['listing_ID'] = request.form['button']
@@ -322,6 +330,22 @@ def getAuctionListings(category):
         if listing:
             for auction in listing:
                 listings.append(getAuctionInfo(auction[0]))
+
+    return listings
+
+
+# Gets auction listings like search keyword
+def getLikeAuctionListings(search):
+    listings = []
+
+    # Get like listings
+    connection = sql.connect('database.db')
+    cursor = connection.execute('SELECT Listing_ID FROM auction_listings WHERE Auction_Title LIKE ? or Product_Name LIKE ?',
+                                ('%' + search + '%','%' + search + '%'))
+    listing = cursor.fetchall()
+    if listing:
+        for auction in listing:
+            listings.append(getAuctionInfo(auction[0]))
 
     return listings
 
@@ -555,11 +579,11 @@ def getWinnerInfo(user):
         'WHERE email=? '
         'AND bidders.home_address_id=address.address_ID '
         'AND address.zipcode=zipcode_info.zipcode ',
-        (user, ))
+        (user,))
     info = cursor.fetchone()
     userInfo = (info[0] + " " + info[1], user,
-                              str(info[2]) + " " + info[3] + ", " + info[4] + ", " + info[
-                                  5] + " " + str(info[6]))
+                str(info[2]) + " " + info[3] + ", " + info[4] + ", " + info[
+                    5] + " " + str(info[6]))
     return userInfo
 
 

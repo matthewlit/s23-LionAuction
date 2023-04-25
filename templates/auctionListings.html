@@ -27,7 +27,12 @@
                 <option value="{{ category }}">{{ category }}</option>
             {%  endfor %}
         </select>
-        <input type="submit" class="buttonSmall" name="button" value="Submit">
+        <button type="submit" class="buttonSmall" name="button" value="Submit">Submit</button>
+    </form>
+    <form style="text-align: center" classaction="" method="post">
+        <label>Search:</label>
+        <input type="text" id="search" name="search" required class="form-control" placeholder="Keyword">
+        <button type="submit" class="buttonSmall" name="button" value="Search">Submit</button>
     </form>
     <table style="width: 90%;">
         <tr>

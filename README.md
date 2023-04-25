@@ -16,7 +16,7 @@ The Phase 2 System Prototype for Lion Auction. Allows a registered user to log i
 
 - **Welcome Page:** Displays a user's relevant information depending on roll. Contains buttons to navigate to other relevant operation for the signed in roll. Sign out button returns user back to `Login Page`
 
-- **Auction Listings Page:** Displays all active auction listings for bidders to browse. Bidders can browse by categories to find more specific auctions. Each auction has an option to go to the `Bid Page` for more information on the auction and place a bid.
+- **Auction Listings Page:** Displays all active auction listings for bidders to browse. Bidders can browse by categories or search to find more specific auctions. Each auction has an option to go to the `Bid Page` for more information on the auction and place a bid.
 
 - **Bid Status Page:** Displays all auction listings the bidder has a bid on and their current status, including if the bidder won the auction. All auctions have an option to go to the `Bid Page` for more information on the auction and place a bid if it is active.
 
